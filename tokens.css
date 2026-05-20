@@ -1,0 +1,249 @@
+/* ============================================================
+   Hacemos Cocina · Guía Repsol
+   Color + Type tokens
+   ============================================================ */
+
+/* ---------- Sole Repsol Display ---------- */
+@font-face {
+  font-family: 'Sole Repsol Display';
+  src: url('fonts/SoleRepsolDisplay_Lt.ttf') format('truetype');
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Sole Repsol Display';
+  src: url('fonts/SoleRepsolDisplay_Rg.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Sole Repsol Display';
+  src: url('fonts/SoleRepsolDisplay_Md.ttf') format('truetype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Sole Repsol Display';
+  src: url('fonts/SoleRepsolDisplay_Bd.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Sole Repsol Display';
+  src: url('fonts/SoleRepsolDisplay_XBd.ttf') format('truetype');
+  font-weight: 800; font-style: normal; font-display: swap;
+}
+
+/* ---------- Sole Repsol Text ---------- */
+@font-face {
+  font-family: 'Sole Repsol Text';
+  src: url('fonts/SoleRepsolText_Lt.ttf') format('truetype');
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Sole Repsol Text';
+  src: url('fonts/SoleRepsolText_LtIt.ttf') format('truetype');
+  font-weight: 300; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Sole Repsol Text';
+  src: url('fonts/SoleRepsolText_Rg.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Sole Repsol Text';
+  src: url('fonts/SoleRepsolText_It.ttf') format('truetype');
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Sole Repsol Text';
+  src: url('fonts/SoleRepsolText_SBd.ttf') format('truetype');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Sole Repsol Text';
+  src: url('fonts/SoleRepsolText_SBdIt.ttf') format('truetype');
+  font-weight: 600; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Sole Repsol Text';
+  src: url('fonts/SoleRepsolText_Bd.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Sole Repsol Text';
+  src: url('fonts/SoleRepsolText_BdIt.ttf') format('truetype');
+  font-weight: 700; font-style: italic; font-display: swap;
+}
+
+:root {
+  /* ---------- BRAND PRIMARY ---------- */
+  --color-azul:           #011E37;   /* Repsol navy — solidez y confianza */
+  --color-amarillo:       #FCB300;   /* Amarillo Guía Repsol — luz y calidez */
+  --color-amarillo-acento:#FFE249;   /* Amarillo de acento — refuerzo puntual */
+
+  /* ---------- STRUCTURE ---------- */
+  --color-blanco:         #FFFFFF;
+  --color-gris:           #F7F7F9;
+
+  /* ---------- NAVY SCALE ---------- */
+  --navy-0:  #F2F9FF;
+  --navy-05: #F0F7FD;
+  --navy-10: #FFE9B2;
+  --navy-20: #FFDA80;
+  --navy-30: #FFCA47;
+  --navy-40: #FCB300;
+  --navy-50: #E9A600;
+  --navy-60: #D19500;
+  --navy-70: #B17D00;
+  --navy-80: #77590D;
+  --navy-90: #443104;   /* Main */
+
+  /* Note: source sheet shares hex codes between Navy & Yellow scales.
+     The semantic Navy shades below are derived to give a usable cool ramp. */
+  --navy-100: #011E37;
+  --navy-200: #0B2E4A;
+  --navy-300: #1B405E;
+  --navy-400: #355773;
+  --navy-500: #527391;
+  --navy-600: #7997AF;   /* Border high */
+  --navy-700: #A6BACB;
+  --navy-800: #D8E5F0;   /* Border low */
+  --navy-900: #ECF2F8;
+
+  /* ---------- YELLOW SCALE ---------- */
+  --yellow-0:  #FFF9EB;
+  --yellow-05: #FFF0CC;
+  --yellow-10: #FFE9B2;
+  --yellow-20: #FFDA80;
+  --yellow-30: #FFCA47;
+  --yellow-40: #FCB300;   /* Main */
+  --yellow-50: #E9A600;
+  --yellow-60: #D19500;
+  --yellow-70: #B17D00;
+  --yellow-80: #77590D;
+  --yellow-90: #443104;
+
+  /* ---------- ACCENT ---------- */
+  --accent-10: #FFED92;
+  --accent-50: #FFE249;   /* Main */
+  --accent-90: #443904;
+
+  /* ---------- SEMANTIC: CONTENT ---------- */
+  --content-01:           #001E37;   /* primary text on light */
+  --content-02:           #43637D;   /* secondary text */
+  --content-inverse-01:   #FFFFFF;   /* primary text on dark */
+  --content-inverse-02:   rgba(255,255,255,0.7); /* secondary on dark */
+
+  /* ---------- SEMANTIC: BACKGROUND ---------- */
+  --background-01:        #001E37;   /* dark feature bg */
+  --background-02:        #FCB300;   /* yellow feature bg */
+  --background-03:        #FFFFFF;   /* default surface */
+  --background-04:        #F7F7F9;   /* subtle surface */
+
+  /* ---------- SEMANTIC: BORDERS ---------- */
+  --border-high:          #7997AF;
+  --border-low:           #D8E5F0;
+
+  /* ---------- SEMANTIC: ACCENT ---------- */
+  --accent:               #FFE249;
+
+  /* ---------- TYPOGRAPHY ---------- */
+  /* Sole Repsol Display + Sole Repsol Text are loaded from fonts/ */
+  --font-display: 'Sole Repsol Display', system-ui, sans-serif;
+  --font-text:    'Sole Repsol Text', system-ui, sans-serif;
+
+  --fw-light:    300;
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-bold:     700;
+  --fw-xbold:    800;
+
+  /* ---------- TYPE SCALE (px @1rem=16px) ---------- */
+  --fs-display-xl: 80px;   --lh-display-xl: 1.05;
+  --fs-display-lg: 56px;   --lh-display-lg: 1.08;
+  --fs-display:    40px;   --lh-display:    1.12;
+  --fs-h1:         32px;   --lh-h1:         1.16;
+  --fs-h2:         24px;   --lh-h2:         1.22;
+  --fs-h3:         20px;   --lh-h3:         1.3;
+  --fs-body-lg:    18px;   --lh-body-lg:    1.5;
+  --fs-body:       16px;   --lh-body:       1.5;
+  --fs-body-sm:    14px;   --lh-body-sm:    1.45;
+  --fs-caption:    12px;   --lh-caption:    1.4;
+  --fs-overline:   11px;   --lh-overline:   1.3;
+
+  /* ---------- SPACING ---------- */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  24px;
+  --space-6:  32px;
+  --space-7:  48px;
+  --space-8:  64px;
+  --space-9:  96px;
+
+  /* ---------- RADII ---------- */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  /* ---------- ELEVATION ---------- */
+  --shadow-sm: 0 1px 2px rgba(1,30,55,0.06), 0 1px 1px rgba(1,30,55,0.04);
+  --shadow-md: 0 4px 12px rgba(1,30,55,0.08), 0 2px 4px rgba(1,30,55,0.04);
+  --shadow-lg: 0 16px 40px rgba(1,30,55,0.12), 0 4px 12px rgba(1,30,55,0.06);
+
+  /* ---------- MOTION ---------- */
+  --ease-standard: cubic-bezier(.2,.7,.2,1);
+  --ease-emphasized: cubic-bezier(.2,.0,0,1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+}
+
+/* ============================================================
+   SEMANTIC TYPE STYLES
+   ============================================================ */
+
+html, body {
+  font-family: var(--font-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--content-01);
+  background: var(--background-03);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.t-display-xl, .t-display-lg, .t-display, .h1, .h2, .h3 {
+  font-family: var(--font-display);
+  color: var(--color-azul);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.t-display-xl { font-size: var(--fs-display-xl); line-height: var(--lh-display-xl); font-weight: var(--fw-bold); letter-spacing: -0.02em; }
+.t-display-lg { font-size: var(--fs-display-lg); line-height: var(--lh-display-lg); font-weight: var(--fw-bold); letter-spacing: -0.02em; }
+.t-display    { font-size: var(--fs-display);    line-height: var(--lh-display);    font-weight: var(--fw-bold); }
+
+.h1 { font-size: var(--fs-h1); line-height: var(--lh-h1); font-weight: var(--fw-bold); }
+.h2 { font-size: var(--fs-h2); line-height: var(--lh-h2); font-weight: var(--fw-bold); }
+.h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); font-weight: var(--fw-medium); }
+
+.body-lg { font-size: var(--fs-body-lg); line-height: var(--lh-body-lg); }
+.body    { font-size: var(--fs-body);    line-height: var(--lh-body); }
+.body-sm { font-size: var(--fs-body-sm); line-height: var(--lh-body-sm); }
+
+.caption {
+  font-size: var(--fs-caption); line-height: var(--lh-caption);
+  color: var(--content-02);
+}
+
+.overline {
+  font-size: var(--fs-overline); line-height: var(--lh-overline);
+  font-weight: var(--fw-bold); letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--color-azul);
+}
+
+/* link */
+a { color: var(--color-azul); text-underline-offset: 3px; }
+a:hover { color: var(--navy-300); }

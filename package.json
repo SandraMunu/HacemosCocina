@@ -1,0 +1,10 @@
+{
+  "name": "hacemos-cocina-proto",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prototipos interactivos de Hacemos cocina (Guía Repsol) — mobile + desktop.",
+  "scripts": {
+    "dev": "npx serve .",
+    "start": "npx serve ."
+  }
+}
