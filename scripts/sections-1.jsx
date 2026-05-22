@@ -6,10 +6,15 @@ const Nav = ({ loggedInUser, onLogout } = {}) => {
   const navLinks = ["Encuentros", "Podcast", "Herramientas", "Artículos"];
   const [menuOpen, setMenuOpen] = React.useState(false);
   const initials = loggedInUser ? (loggedInUser.nombre[0] || "") + (loggedInUser.apellido[0] || "") : "";
+  const goHome = (e) => {
+    e.preventDefault();
+    if (window.__goHome) window.__goHome();
+    else window.scrollTo(0, 0);
+  };
   return (
     <header className="nav nav--light">
       <div className="wrap nav__inner">
-        <a className="nav__brand" href="#" aria-label="guía repsol — Hacemos cocina">
+        <a className="nav__brand" href="#" onClick={goHome} aria-label="guía repsol — Hacemos cocina">
           <img src="assets/logo-hacemos-cocina.svg" alt="guía repsol | Hacemos cocina" className="nav__logo" />
         </a>
         <nav className="nav__links">
@@ -22,19 +27,10 @@ const Nav = ({ loggedInUser, onLogout } = {}) => {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
           </button>
           {loggedInUser ?
-          <div className="nav__user" onClick={() => setMenuOpen(!menuOpen)}>
+          <button type="button" className="nav__user" onClick={(e) => { e.preventDefault(); window.__goPrivate && window.__goPrivate(); }} aria-label="Ir a tu área privada">
               <span className="nav__avatar"><img src="assets/user-avatar.png" alt={initials || "AG"} /></span>
               <span className="nav__user-name">{loggedInUser.nombre || "Ane"}</span>
-              {menuOpen &&
-            <div className="nav__menu" onClick={(e) => e.stopPropagation()}>
-                  <a href="#" className="nav__menu-item">Mi perfil</a>
-                  <a href="#" className="nav__menu-item">Mis establecimientos</a>
-                  <a href="#" className="nav__menu-item">Ajustes</a>
-                  <div className="nav__menu-sep"></div>
-                  <button className="nav__menu-item" onClick={onLogout}>Cerrar sesión</button>
-                </div>
-            }
-            </div> :
+            </button> :
 
           <a className="btn btn--navy btn--sm" href="#" onClick={(e) => {e.preventDefault();window.__openRegister && window.__openRegister();}}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>
@@ -57,15 +53,15 @@ const Hero = () =>
           <span className="dot"></span>
           
         </div>
-        <h1 className="hero__title" style={{ fontWeight: "400" }}>
-          <br />Tu día a día,<br />tu Guía Repsol
+        <h1 className="hero__title">
+          <br />Tu día a día,<br />tu espacio en Guía Repsol
         </h1>
         <p className="hero__lede" style={{ fontSize: "16px" }}>El lugar donde conectas con otros hosteleros, compartes experiencias y resuelves tu día a día con las herramientas que necesitas.
 
       </p>
         <div className="hero__cta-row">
-          <a className="btn btn--primary" href="#">Regístrate <Icon name="arrow" size={18} /></a>
-          <a className="btn btn--navy-outline" href="#">Inicia sesión</a>
+          <a className="btn btn--primary" href="#" onClick={(e) => { e.preventDefault(); window.__openRegister && window.__openRegister(); }}>Regístrate <Icon name="arrow" size={18} /></a>
+          <a className="btn btn--navy-outline" href="#" onClick={(e) => { e.preventDefault(); window.__openLogin && window.__openLogin(); }}>Inicia sesión</a>
           <span className="hero__cta-meta"></span>
         </div>
         <div className="hero__stats">
@@ -140,7 +136,7 @@ const Eventos = () =>
         </div>
         <a className="section__see-all" href="#">Ver todos <Icon name="arrow" size={14} /></a>
       </div>
-      <div className="eventos__grid" style={{ padding: "4px 16px 8px" }}>
+      <div className="eventos__grid">
         {HC_DATA.eventos.map((ev) => <EventCard key={ev.id} ev={ev} />)}
       </div>
     </div>

@@ -42,7 +42,7 @@ window.HC_DATA = {
     },
   ],
   podcasts: [
-    { id: "p1", title: "Sara Aznar y Nacho Ventosa, Los 33", ep: "01", date: "Oct 7", dur: "01:05:22", isNew: false, art: "assets/podcast-1.png" },
+    { id: "p1", title: "Sara Aznar y Nacho Ventosa, Los 33", ep: "01", date: "Oct 7", dur: "01:05:22", isNew: true, art: "assets/podcast-1.png" },
     { id: "p2", title: "Lucía Freitas, A Tafona", ep: "02", date: "Oct 14", dur: "00:58:11", isNew: false, art: "assets/podcast-2.png" },
     { id: "p3", title: "Javier Zanz y Juan Sahuquillo, Cañitas Maite", ep: "03", date: "Oct 21", dur: "01:12:04", isNew: false, art: "assets/podcast-3.png" },
     { id: "p4", title: "Don Panko, David de la Torre", ep: "04", date: "Oct 28", dur: "01:02:48", isNew: false, art: "assets/podcast-4.png" },

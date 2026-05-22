@@ -3,9 +3,8 @@
 // Datos del establecimiento activo
 const PA_DATA = {
   establecimientos: [
-  { id: "tar", name: "Taberna Arrano", active: true },
-  { id: "dma", name: "Doña Manuela", active: false },
-  { id: "che", name: "Ché Bolú", active: false }],
+  { id: "tar", name: "Taberna Arrano", active: true, isSolete: true },
+  { id: "dma", name: "Doña Manuela", active: false, isSolete: false, cover: "assets/cover-establecimiento.jpg" }],
 
   cover: "assets/cover-arrano.png",
   resena: `El cocinero se provee de productos silvestres y otros de pequeños ganaderos, agricultores y artesanos (cordero, pan, trucha…), y fuego lento y paciencia son herramientas con las que posteriormente elabora guisos concentrados, salsas con fondo y combinaciones ligeras que pueden presumir.`,
@@ -51,10 +50,10 @@ const PA_DATA = {
 };
 
 // ---------- COVER ----------
-const ProfileCover = () =>
+const ProfileCover = ({ cover }) =>
 <section className="pa-cover">
     <div className="container">
-      <div className="pa-cover__photo" style={{ backgroundImage: `url(${PA_DATA.cover})` }}>
+      <div className="pa-cover__photo" style={{ backgroundImage: `url(${cover})` }}>
         <button className="pa-cover__edit">
           <Icon name="image" size={16} /> Cambiar foto
         </button>
@@ -70,7 +69,7 @@ const SideRail = ({ user, activeEstab, setActiveEstab }) =>
       <img src="assets/user-avatar.png" alt="Ane" />
     </div>
     <h1 className="pa-greeting">Aupa, {user.nombre || "Ane"}!</h1>
-    <a className="pa-rail__edit" href="#">
+    <a className="pa-rail__edit" href="#" onClick={(e) => {e.preventDefault();window.__editProfile && window.__editProfile();}}>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" /></svg>
       Editar perfil
     </a>
@@ -80,10 +79,14 @@ const SideRail = ({ user, activeEstab, setActiveEstab }) =>
           {e.name}
         </button>
     )}
+      <button type="button" className="pa-chip pa-chip--add" aria-label="Añadir nuevo establecimiento">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+        Añadir
+      </button>
     </div>
     <div className="pa-rail__divider"></div>
     <nav className="pa-rail__nav">
-      <a className="pa-rail__link" href="#">
+      <a className="pa-rail__link" href="#" onClick={(e) => {e.preventDefault();window.__viewEstablishments && window.__viewEstablishments();}}>
         <span>Ver datos de los establecimientos</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
       </a>
@@ -97,10 +100,10 @@ const SideRail = ({ user, activeEstab, setActiveEstab }) =>
 
 
 // ---------- ESTABLISHMENT NAME ----------
-const EstabName = () =>
+const EstabName = ({ estab }) =>
 <div className="pa-estab" style={{ gap: "0px" }}>
-  <img className="pa-estab__badge" src="assets/badge-solete.png" alt="Solete · guía repsol" />
-  <h1 className="pa-h1-estab">Taberna Arrano</h1>
+  {estab.isSolete && <img className="pa-estab__badge" src="assets/badge-solete.png" alt="Solete · guía repsol" />}
+  <h1 className="pa-h1-estab">{estab.name}</h1>
 </div>;
 
 
@@ -127,7 +130,20 @@ const SobreTi = () =>
   </section>;
 
 
-// ---------- SOLETE MATERIALES (compact) ----------
+// ---------- JOIN GUÍA REPSOL (non-Solete establishments) ----------
+const JoinGuiaRepsol = () =>
+<section className="pa-sobreti-wrap" style={{ gap: "20px" }}>
+    <div className="pa-join-card">
+      <div className="pa-join-card__copy">
+        <h2 className="pa-h2 pa-join-card__title">¿Quieres que tu establecimiento aparezca en Guía Repsol?</h2>
+        <p className="pa-join-card__lede">Cuéntanos tu proyecto y, si encaja en nuestro radar, hablamos. Sin compromiso, sin prisa: solo lo que cocináis y por qué creéis que merece la pena.</p>
+      </div>
+      <a href="#" className="btn btn--navy pa-join-card__cta">
+        Cuéntanos tu proyecto
+        <Icon name="arrow" size={14} />
+      </a>
+    </div>
+  </section>;
 const SoleteCreativos = () =>
 <section className="pa-sobreti-wrap">
   <h2 className="pa-h2 pa-sobreti__h2">Materiales para tu Solete</h2>
@@ -207,6 +223,26 @@ const REVIEW_THEMES = [
 }];
 
 
+const SocialTabs = () => {
+  const [active, setActive] = React.useState("Google");
+  const tabs = ["Google", "Tripadvisor", "Instagram", "Facebook", "Tiktok"];
+  return (
+    <div className="pa-social-tabs" role="tablist">
+      {tabs.map((n) =>
+      <button
+        key={n}
+        role="tab"
+        type="button"
+        aria-selected={active === n}
+        className={"pa-social-tab" + (active === n ? " is-active" : "")}
+        onClick={() => setActive(n)}>
+          {n}
+        </button>
+      )}
+    </div>);
+
+};
+
 const ThemeIcon = ({ tone }) => {
   const common = { width: 22, height: 22, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round" };
   if (tone === "alert") return <svg {...common}><path d="M12 9v4M12 17h.01" /><path d="M10.3 3.86 2.18 18a2 2 0 0 0 1.74 3h16.16a2 2 0 0 0 1.74-3L13.71 3.86a2 2 0 0 0-3.42 0Z" /></svg>;
@@ -244,26 +280,7 @@ const EvolucionaNegocio = () =>
           <h3>Conecta tus redes y accede a tus valoraciones</h3>
         </header>
         <p className="pa-card__lede"></p>
-        <div className="pa-socials">
-          {[
-        { n: "Google", c: "#fff", b: true },
-        { n: "Tripadvisor", c: "#34E0A1" },
-        { n: "Instagram", c: "linear-gradient(135deg,#fdcd36,#f55d36,#c43091)" },
-        { n: "Facebook", c: "#1877F2" },
-        { n: "Tiktok", c: "#000" }].
-        map((s) =>
-        <button key={s.n} className="pa-social" type="button">
-              <span className="pa-social__ic" style={{ background: s.c, border: s.b ? '1px solid var(--border-low,#D8E5F0)' : 'none' }}>
-                {s.n === "Google" && <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4c-.2 1.2-1 2.3-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z" /><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1H3.1v2.6C4.7 19.7 8.1 22 12 22z" /><path fill="#FBBC04" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1c-.7 1.4-1.1 3-1.1 4.6 0 1.6.4 3.2 1.1 4.6L6.4 14z" /><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.8-2.8C16.9 3 14.7 2 12 2 8.1 2 4.7 4.3 3.1 7.4L6.4 10c.8-2.4 3-4.1 5.6-4.1z" /></svg>}
-                {s.n === "Tripadvisor" && <svg width="14" height="14" viewBox="0 0 24 24" fill="#000"><circle cx="8" cy="14" r="2.5" /><circle cx="16" cy="14" r="2.5" /></svg>}
-                {s.n === "Instagram" && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="#fff" /></svg>}
-                {s.n === "Facebook" && <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M14 22v-8h3l1-4h-4V8c0-1 .5-2 2-2h2V2.5C17 2 16 2 15 2c-3 0-5 2-5 5v3H7v4h3v8h4z" /></svg>}
-                {s.n === "Tiktok" && <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M16 4c.5 2 2 3.5 4 4v3c-1.5 0-3-.4-4-1v7a6 6 0 1 1-6-6c.4 0 .7 0 1 .1V14c-.3-.1-.6-.1-1-.1a3 3 0 1 0 3 3V4h3z" /></svg>}
-              </span>
-              {s.n}
-            </button>
-        )}
-        </div>
+        <SocialTabs />
         <div className="pa-rating">
           <div className="pa-rating__num">
             <span className="pa-rating__big">4,6</span><span className="pa-rating__den">/5</span>
@@ -301,7 +318,7 @@ const EvolucionaNegocio = () =>
                   </div>
                   <p className="pa-suggest__text">{r.sugerencia}</p>
                   <div className="pa-suggest__actions">
-                    <button className="btn btn--navy btn--sm" type="button">Copiar</button>
+                    <button className="btn btn--navy btn--sm" type="button">Copiar respuesta</button>
                     <button className="btn btn--ghost btn--sm" type="button">Editar</button>
                   </div>
                 </div> :
@@ -331,7 +348,7 @@ const CHAT_DATA = {
 
 };
 
-const ChatModal = ({ user, onClose }) => {
+const ChatModal = ({ user, onClose, onRegister }) => {
   // Close on Esc
   React.useEffect(() => {
     const onKey = (e) => {if (e.key === "Escape") onClose();};
@@ -341,12 +358,39 @@ const ChatModal = ({ user, onClose }) => {
     };
   }, [onClose]);
 
+  const isGuest = !user;
+  const [guestStep, setGuestStep] = React.useState(1);
+  const [guestEmail, setGuestEmail] = React.useState("");
+  const [guestName, setGuestName] = React.useState("");
+  const [guestPhone, setGuestPhone] = React.useState("");
+  const [guestPassword, setGuestPassword] = React.useState("");
+  const [guestShowPwd, setGuestShowPwd] = React.useState(false);
+  const emailRef = React.useRef(null);
+
+  const handleEmailSubmit = (e) => {
+    e.preventDefault();
+    const val = (emailRef.current && emailRef.current.value || "").trim();
+    if (val) setGuestEmail(val);
+    setGuestStep(2);
+  };
+  const handleNameSubmit = (e) => {
+    e.preventDefault();
+    setGuestStep(3);
+  };
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
+    onClose();
+    if (onRegister) onRegister();
+  };
+
   return (
     <div className="chat-modal" role="dialog" aria-label="Asistente Guía Repsol">
       <div className="chat-modal__panel">
         {/* Header */}
         <header className="chat-modal__header">
-          <h2 className="chat-modal__title" style={{ fontWeight: "400" }}>¿Cómo podemos ayudarte?</h2>
+          <h2 className="chat-modal__title" style={{ fontWeight: "400", padding: "24px 0px 16px 24px" }}>
+            {isGuest ? "Hola, Bienvenido a Guía Repsol Hacemos Cocina" : "¿Cómo podemos ayudarte?"}
+          </h2>
           <div className="chat-modal__head-actions">
             <button type="button" className="chat-modal__close" onClick={onClose} aria-label="Cerrar">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
@@ -358,54 +402,150 @@ const ChatModal = ({ user, onClose }) => {
 
         {/* Body */}
         <div className="chat-modal__body">
-          {/* User bubble */}
-          <div className="chat-bubble chat-bubble--user">
-            <p>{CHAT_DATA.question}</p>
-          </div>
+          {isGuest ?
+          <div className="chat-guest">
+              <div className="chat-bubble chat-bubble--bot chat-bubble--guest">
+                <p className="chat-guest__lede">
+                  Soy el asistente de <strong>Hacemos cocina</strong>. Puedo ayudarte con dudas sobre tu negocio, reseñas, gestión de personal, costes de menú o cualquier cosa del día a día en hostelería.
+                </p>
+                <p className="chat-guest__lede" style={{ fontWeight: "700" }}>Envíame tu email para acceder.</p>
+                {guestStep === 1 &&
+              <form className="chat-guest__form" onSubmit={handleEmailSubmit}>
+                    <input ref={emailRef} type="email" required placeholder="tu@correo.com" className="chat-guest__input" aria-label="Correo electrónico" />
+                    <button type="submit" className="chat-guest__submit" aria-label="Enviar">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                    </button>
+                  </form>
+              }
+              </div>
 
-          {/* Assistant response */}
-          <div className="chat-bubble chat-bubble--bot">
-            <p>{CHAT_DATA.answer}</p>
-          </div>
-
-          {/* Insight cards */}
-          <div className="chat-insights">
-            <article className="chat-insight chat-insight--green">
-              <span className="chat-insight__label" style={{ fontWeight: "600" }}>Aprendizajes</span>
-              <p className="chat-insight__text">{CHAT_DATA.learnings}</p>
-            </article>
-            <article className="chat-insight chat-insight--blue">
-              <span className="chat-insight__label" style={{ fontWeight: "600" }}>Qué hacer</span>
-              <p className="chat-insight__text">{CHAT_DATA.todo}</p>
-            </article>
-          </div>
-
-          {/* Otros Soletes hicieron */}
-          <section className="chat-related">
-            <div className="chat-related__head">
-              <span className="chat-related__tag" style={{ fontWeight: "600" }}>
-                <img className="chat-related__icon" src="assets/solete-face.png" alt="" aria-hidden="true" />
-                <span className="chat-related__label">Otros Soletes hicieron</span>
-              </span>
-            </div>
-            <ul className="chat-related__list">
-              {CHAT_DATA.related.map((r, i) =>
-              <li key={i} className="chat-related__item" style={{ width: "2000px" }}>
-                  <div className="chat-related__meta">
-                    <span className="chat-related__name" style={{ fontWeight: "400" }}>{r.name}</span>
-                    <span className="chat-related__sub">{r.meta}</span>
+              {guestStep >= 2 &&
+            <React.Fragment>
+                  <div className="chat-bubble chat-bubble--user">
+                    <p>{guestEmail || "Mi correo"}</p>
                   </div>
-                  <button type="button" className="chat-related__more" aria-label="Más opciones">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                      <circle cx="12" cy="5" r="1.6" />
-                      <circle cx="12" cy="12" r="1.6" />
-                      <circle cx="12" cy="19" r="1.6" />
-                    </svg>
-                  </button>
-                </li>
-              )}
-            </ul>
-          </section>
+                  <div className="chat-bubble chat-bubble--bot chat-bubble--guest">
+                    <p className="chat-guest__lede">
+                      <strong>¡Genial!</strong> Aún no tienes cuenta, mándame tu nombre y número de teléfono para entrar.
+                    </p>
+                    {guestStep === 2 &&
+                <form className="chat-guest__form chat-guest__form--stack" onSubmit={handleNameSubmit}>
+                        <input
+                    type="text"
+                    required
+                    placeholder="Nombre"
+                    className="chat-guest__input chat-guest__input--solo"
+                    aria-label="Nombre"
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)} />
+                        <div className="chat-guest__form-row">
+                          <input
+                      type="tel"
+                      required
+                      placeholder="Teléfono"
+                      className="chat-guest__input"
+                      aria-label="Teléfono"
+                      value={guestPhone}
+                      onChange={(e) => setGuestPhone(e.target.value)} />
+                          <button type="submit" className="chat-guest__submit" aria-label="Enviar">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                          </button>
+                        </div>
+                      </form>
+                }
+                  </div>
+                </React.Fragment>
+            }
+
+              {guestStep >= 3 &&
+            <React.Fragment>
+                  <div className="chat-bubble chat-bubble--user">
+                    <p>{(guestName || "Nombre") + " · " + (guestPhone || "Teléfono")}</p>
+                  </div>
+                  <div className="chat-bubble chat-bubble--bot chat-bubble--guest">
+                    <p className="chat-guest__lede">
+                      <strong>Muchas gracias{guestName ? ", " + guestName : ""}.</strong> Ya solo te falta crear una contraseña.
+                    </p>
+                    <form className="chat-guest__form" onSubmit={handlePasswordSubmit}>
+                      <input
+                    type={guestShowPwd ? "text" : "password"}
+                    required
+                    minLength={4}
+                    placeholder="Tu contraseña"
+                    className="chat-guest__input"
+                    aria-label="Contraseña"
+                    value={guestPassword}
+                    onChange={(e) => setGuestPassword(e.target.value)} />
+                      <button
+                    type="button"
+                    className="chat-guest__eye"
+                    aria-label={guestShowPwd ? "Ocultar contraseña" : "Mostrar contraseña"}
+                    onClick={() => setGuestShowPwd(!guestShowPwd)}>
+                        {guestShowPwd ?
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a19.86 19.86 0 0 1 4.24-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a19.86 19.86 0 0 1-3.17 4.42M1 1l22 22M9.88 9.88a3 3 0 1 0 4.24 4.24" /></svg> :
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                    }
+                      </button>
+                      <button type="submit" className="chat-guest__submit" aria-label="Enviar">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                      </button>
+                    </form>
+                  </div>
+                </React.Fragment>
+            }
+            </div> :
+
+          <React.Fragment>
+              {/* User bubble */}
+              <div className="chat-bubble chat-bubble--user">
+                <p>{CHAT_DATA.question}</p>
+              </div>
+
+              {/* Assistant response */}
+              <div className="chat-bubble chat-bubble--bot">
+                <p>{CHAT_DATA.answer}</p>
+              </div>
+
+              {/* Insight cards */}
+              <div className="chat-insights">
+                <article className="chat-insight chat-insight--green">
+                  <span className="chat-insight__label" style={{ fontWeight: "600" }}>Aprendizajes</span>
+                  <p className="chat-insight__text">{CHAT_DATA.learnings}</p>
+                </article>
+                <article className="chat-insight chat-insight--blue">
+                  <span className="chat-insight__label" style={{ fontWeight: "600" }}>Qué hacer</span>
+                  <p className="chat-insight__text">{CHAT_DATA.todo}</p>
+                </article>
+              </div>
+
+              {/* Otros Soletes hicieron */}
+              <section className="chat-related">
+                <div className="chat-related__head">
+                  <span className="chat-related__tag" style={{ fontWeight: "600" }}>
+                    <img className="chat-related__icon" src="assets/solete-face.png" alt="" aria-hidden="true" />
+                    <span className="chat-related__label">Otros Soletes hicieron</span>
+                  </span>
+                </div>
+                <ul className="chat-related__list">
+                  {CHAT_DATA.related.map((r, i) =>
+                <li key={i} className="chat-related__item" style={{ width: "2000px" }}>
+                      <div className="chat-related__meta">
+                        <span className="chat-related__name" style={{ fontWeight: "400" }}>{r.name}</span>
+                        <span className="chat-related__sub">{r.meta}</span>
+                      </div>
+                      <button type="button" className="chat-related__more" aria-label="Más opciones">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                          <circle cx="12" cy="5" r="1.6" />
+                          <circle cx="12" cy="12" r="1.6" />
+                          <circle cx="12" cy="19" r="1.6" />
+                        </svg>
+                      </button>
+                    </li>
+                )}
+                </ul>
+              </section>
+            </React.Fragment>
+          }
         </div>
 
         {/* Footer */}
@@ -430,6 +570,7 @@ const ChatModal = ({ user, onClose }) => {
 const PrivateArea = ({ user, onLogout }) => {
   const [activeEstab, setActiveEstab] = React.useState("tar");
   const [chatOpen, setChatOpen] = React.useState(false);
+  const activeData = PA_DATA.establecimientos.find((e) => e.id === activeEstab) || PA_DATA.establecimientos[0];
 
   React.useEffect(() => {
     window.__onLogout = onLogout;
@@ -440,13 +581,13 @@ const PrivateArea = ({ user, onLogout }) => {
     <React.Fragment>
       <Nav loggedInUser={user} onLogout={onLogout} />
       <main className="pa-main">
-        <ProfileCover />
+        <ProfileCover cover={PA_DATA.cover} />
         <div className="container pa-layout">
           <SideRail user={user} activeEstab={activeEstab} setActiveEstab={setActiveEstab} />
           <div className="pa-content" style={{ padding: "32px 0px 0px 8px", gap: "48px" }}>
-            <EstabName />
-            <SobreTi />
-            <SoleteCreativos />
+            <EstabName estab={activeData} />
+            {activeData.isSolete ? <SobreTi /> : <JoinGuiaRepsol />}
+            {activeData.isSolete && <SoleteCreativos />}
             <AccesosDirectos />
             <EvolucionaNegocio />
           </div>
@@ -465,3 +606,246 @@ const PrivateArea = ({ user, onLogout }) => {
 };
 
 window.PrivateArea = PrivateArea;
+window.ChatModal = ChatModal;
+
+// ---------- ESTABLISHMENT DETAILS PAGE ----------
+const ESTAB_DETAILS = {
+  tar: {
+    nombre: "Taberna Arrano",
+    tipo: "Restaurante",
+    cif: "B12345678",
+    direccion: "Calle Mayor, 14",
+    cp: "20001",
+    municipio: "San Sebastián",
+    provincia: "Gipuzkoa",
+    ccaa: "País Vasco",
+    telPublico: "+34 943 12 34 99"
+  },
+  dma: {
+    nombre: "Doña Manuela",
+    tipo: "Bar / Cafetería",
+    cif: "B98765432",
+    direccion: "Plaza del Sol, 7",
+    cp: "28013",
+    municipio: "Madrid",
+    provincia: "Madrid",
+    ccaa: "Madrid",
+    telPublico: "+34 91 555 22 22"
+  }
+};
+
+const ESTAB_FIELDS = [
+["Nombre del establecimiento", "nombre"],
+["CIF", "cif"],
+["Dirección", "direccion"],
+["Código postal", "cp"],
+["Municipio", "municipio"],
+["Provincia", "provincia"],
+["Comunidad autónoma", "ccaa"]];
+
+
+
+const EstablishmentsPage = ({ user, onBack, embedded = false }) => {
+  const [active, setActive] = React.useState("tar");
+  const [allData, setAllData] = React.useState(ESTAB_DETAILS);
+  const data = allData[active] || ESTAB_DETAILS.tar;
+  const meta = PA_DATA.establecimientos.find((e) => e.id === active) || PA_DATA.establecimientos[0];
+  const setField = (k) => (e) => setAllData({ ...allData, [active]: { ...data, [k]: e.target.value } });
+  const fullFields = new Set(["nombre", "direccion"]);
+
+  return (
+    <React.Fragment>
+      {!embedded && <Nav loggedInUser={user} onLogout={() => window.__goHome && window.__goHome()} />}
+      <main className="ed-main">
+        <div className="container">
+          <button type="button" className="ed-back" onClick={onBack}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6" /></svg>
+            Volver a mi área privada
+          </button>
+          <header className="ed-header">
+            <h1 className="ed-title">Datos de tus establecimientos</h1>
+            <p className="ed-lede">Revisa y actualiza la información que tenemos de cada uno de tus negocios. Es lo que aparece en tu ficha y lo que usamos para personalizar tu día a día.</p>
+          </header>
+
+          <div className="ed-chips" role="tablist" aria-label="Establecimientos">
+            {PA_DATA.establecimientos.map((e) =>
+            <button
+              key={e.id}
+              role="tab"
+              aria-selected={active === e.id}
+              className={"pa-chip " + (active === e.id ? "is-active" : "")}
+              onClick={() => setActive(e.id)}>
+                {e.name}
+              </button>
+            )}
+            <button type="button" className="pa-chip pa-chip--add" aria-label="Añadir nuevo establecimiento">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+              Añadir nuevo establecimiento
+            </button>
+          </div>
+
+          <article className="ed-card">
+            <header className="ed-card__head">
+              <div className="ed-card__title-row" style={{ gap: "1px" }}>
+                {meta.isSolete && <img className="pa-estab__badge" src="assets/badge-solete.png" alt="Solete · guía repsol" />}
+                <h2 className="ed-card__title">{data.nombre}</h2>
+              </div>
+              <a className="pa-link" href="#">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" /></svg>
+                Editar datos
+              </a>
+            </header>
+
+            <div className="auth-grid auth-grid--two">
+              {ESTAB_FIELDS.map(([label, key]) => {
+                const cls = "field field--float" + (fullFields.has(key) ? " field--full" : "");
+                return (
+                  <div key={key} className={cls}>
+                    <input id={`ef-${active}-${key}`} type="text" placeholder=" " value={data[key] || ""} onChange={setField(key)} />
+                    <label htmlFor={`ef-${active}-${key}`}>{label}</label>
+                  </div>);
+
+              })}
+            </div>
+
+            <a className="ed-delete" href="#" onClick={(e) => e.preventDefault()}>
+              <span>Eliminar establecimiento</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+            </a>
+
+            <div className="ep-actions ed-actions">
+              <button type="button" className="btn btn--ghost" onClick={onBack}>Cancelar</button>
+              <button type="button" className="btn btn--navy" onClick={onBack}>Guardar</button>
+            </div>
+          </article>
+        </div>
+      </main>
+      {!embedded && <Footer />}
+    </React.Fragment>);
+
+};
+
+window.EstablishmentsPage = EstablishmentsPage;
+
+// ---------- EDIT PROFILE PAGE ----------
+const EditProfilePage = ({ user, onBack, embedded = false }) => {
+  const [d, setD] = React.useState({
+    nombre: user.nombre || "Ane",
+    apellido: user.apellido || "García Castellón",
+    email: user.email || "ane.garcia@gmail.com",
+    telefono: user.telefono || "657 341 298",
+    pwdOld: "",
+    pwdNew: "",
+    pwdConfirm: ""
+  });
+  const [pwdOpen, setPwdOpen] = React.useState(true);
+  const [showOld, setShowOld] = React.useState(false);
+  const [showNew, setShowNew] = React.useState(false);
+  const [showConfirm, setShowConfirm] = React.useState(false);
+  const set = (k) => (e) => setD({ ...d, [k]: e.target.value });
+
+  const InfoCircle = ({ title }) =>
+  <span className="ep-info" title={title} aria-label={title}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" /><path d="M12 8h.01" /><path d="M11 12h1v5h1" />
+      </svg>
+    </span>;
+
+  const EyeIcon = ({ open }) => open ?
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a19.86 19.86 0 0 1 4.24-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a19.86 19.86 0 0 1-3.17 4.42M1 1l22 22M9.88 9.88a3 3 0 1 0 4.24 4.24" /></svg> :
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>;
+
+  return (
+    <React.Fragment>
+      {!embedded && <Nav loggedInUser={user} onLogout={() => window.__goHome && window.__goHome()} />}
+      <main className="ep-main">
+        <div className="container">
+          <button type="button" className="ed-back" onClick={onBack}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6" /></svg>
+            Volver a mi área privada
+          </button>
+
+          <header className="ep-header">
+            <h1 className="ep-title">Editar perfil</h1>
+            <p className="ep-lede">Actualiza tus datos personales, tu contraseña y la configuración de tu cuenta.</p>
+          </header>
+
+          <section className="ep-card">
+            <header className="ep-card__head"><h2 className="ep-card__title">Datos personales</h2></header>
+            <div className="ep-card__body">
+              <div className="auth-grid auth-grid--two">
+                <div className="field field--float">
+                  <input id="ep-nombre" type="text" placeholder=" " value={d.nombre} onChange={set("nombre")} />
+                  <label htmlFor="ep-nombre">Nombre</label>
+                </div>
+                <div className="field field--float">
+                  <input id="ep-email" type="email" placeholder=" " value={d.email} onChange={set("email")} disabled />
+                  <label htmlFor="ep-email" className="is-floated">Correo electrónico <InfoCircle title="Para modificar el correo electrónico contacta con Atención al cliente." /></label>
+                </div>
+                <div className="field field--float">
+                  <input id="ep-apellido" type="text" placeholder=" " value={d.apellido} onChange={set("apellido")} />
+                  <label htmlFor="ep-apellido">Apellidos</label>
+                </div>
+                <div className="field field--float">
+                  <input id="ep-tel" type="tel" placeholder=" " value={d.telefono} onChange={set("telefono")} />
+                  <label htmlFor="ep-tel">Teléfono Móvil</label>
+                </div>
+              </div>
+
+              <p className="ep-important">
+                <strong>Importante:</strong> Para modificar el correo electrónico, es necesario que te pongas en contacto con nuestro equipo de Atención al cliente <a href="#">[Correo X, Teléfono X]</a>.
+              </p>
+
+              <button type="button" className="ep-toggle" onClick={() => setPwdOpen(!pwdOpen)} aria-expanded={pwdOpen}>
+                <span>Modificar contraseña</span>
+                <svg className={"ep-toggle__chev " + (pwdOpen ? "is-open" : "")} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+              </button>
+
+              {pwdOpen &&
+              <div className="auth-grid auth-grid--two">
+                  <div className="field field--float field--full field--pwd">
+                    <input id="ep-pwd-old" type={showOld ? "text" : "password"} placeholder=" " value={d.pwdOld} onChange={set("pwdOld")} />
+                    <label htmlFor="ep-pwd-old">Contraseña actual</label>
+                    <button type="button" className="field__eye" aria-label={showOld ? "Ocultar" : "Mostrar"} onClick={() => setShowOld(!showOld)}><EyeIcon open={showOld} /></button>
+                  </div>
+                  <div className="field field--float field--pwd">
+                    <input id="ep-pwd-new" type={showNew ? "text" : "password"} placeholder=" " value={d.pwdNew} onChange={set("pwdNew")} />
+                    <label htmlFor="ep-pwd-new">Nueva contraseña <InfoCircle title="8 caracteres, una letra y un número o símbolo." /></label>
+                    <button type="button" className="field__eye" aria-label={showNew ? "Ocultar" : "Mostrar"} onClick={() => setShowNew(!showNew)}><EyeIcon open={showNew} /></button>
+                  </div>
+                  <div className="field field--float field--pwd">
+                    <input id="ep-pwd-confirm" type={showConfirm ? "text" : "password"} placeholder=" " value={d.pwdConfirm} onChange={set("pwdConfirm")} />
+                    <label htmlFor="ep-pwd-confirm">Confirmar nueva contraseña</label>
+                    <button type="button" className="field__eye" aria-label={showConfirm ? "Ocultar" : "Mostrar"} onClick={() => setShowConfirm(!showConfirm)}><EyeIcon open={showConfirm} /></button>
+                  </div>
+                </div>
+              }
+
+              <div className="ep-actions">
+                <button type="button" className="btn btn--ghost" onClick={onBack}>Cancelar</button>
+                <button type="button" className="btn btn--navy" onClick={onBack}>Guardar</button>
+              </div>
+            </div>
+          </section>
+
+          <section className="ep-card">
+            <header className="ep-card__head"><h2 className="ep-card__title">Cuenta</h2></header>
+            <div className="ep-card__body">
+              <a className="ep-row" href="#">
+                <span>Condiciones legales</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+              </a>
+              <a className="ep-row" href="#">
+                <span>Eliminar mi cuenta</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+              </a>
+            </div>
+          </section>
+        </div>
+      </main>
+      {!embedded && <Footer />}
+    </React.Fragment>);
+
+};
+
+window.EditProfilePage = EditProfilePage;

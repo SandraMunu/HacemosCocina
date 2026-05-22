@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hacemos cocina · guía repsol</title>
+<link rel="stylesheet" href="tokens.css"/>
+<link rel="stylesheet" href="styles/app.css"/>
+<link rel="stylesheet" href="styles/sections.css"/>
+<link rel="stylesheet" href="styles/auth.css"/>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<meta name="ext-resource-dependency" content="assets/ai-sparkle.svg" data-resource-id="assets_ai_sparkle_svg" />
+<meta name="ext-resource-dependency" content="assets/articulo-1.png" data-resource-id="assets_articulo_1_png" />
+<meta name="ext-resource-dependency" content="assets/articulo-2.png" data-resource-id="assets_articulo_2_png" />
+<meta name="ext-resource-dependency" content="assets/articulo-3.png" data-resource-id="assets_articulo_3_png" />
+<meta name="ext-resource-dependency" content="assets/badge-solete.png" data-resource-id="assets_badge_solete_png" />
+<meta name="ext-resource-dependency" content="assets/chat-keyboard.svg" data-resource-id="assets_chat_keyboard_svg" />
+<meta name="ext-resource-dependency" content="assets/chat-sparkle.svg" data-resource-id="assets_chat_sparkle_svg" />
+<meta name="ext-resource-dependency" content="assets/chat-upload.svg" data-resource-id="assets_chat_upload_svg" />
+<meta name="ext-resource-dependency" content="assets/chat-voice-icon.svg" data-resource-id="assets_chat_voice_icon_svg" />
+<meta name="ext-resource-dependency" content="assets/chat-voice.svg" data-resource-id="assets_chat_voice_svg" />
+<meta name="ext-resource-dependency" content="assets/cover-arrano.png" data-resource-id="assets_cover_arrano_png" />
+<meta name="ext-resource-dependency" content="assets/creativo-post-69.png" data-resource-id="assets_creativo_post_69_png" />
+<meta name="ext-resource-dependency" content="assets/creativo-post-70.png" data-resource-id="assets_creativo_post_70_png" />
+<meta name="ext-resource-dependency" content="assets/creativo-post-73.png" data-resource-id="assets_creativo_post_73_png" />
+<meta name="ext-resource-dependency" content="assets/embajador-angel.png" data-resource-id="assets_embajador_angel_png" />
+<meta name="ext-resource-dependency" content="assets/embajador-cristina-yajaira.png" data-resource-id="assets_embajador_cristina_yajaira_png" />
+<meta name="ext-resource-dependency" content="assets/embajador-lara.png" data-resource-id="assets_embajador_lara_png" />
+<meta name="ext-resource-dependency" content="assets/evento-1.png" data-resource-id="assets_evento_1_png" />
+<meta name="ext-resource-dependency" content="assets/evento-2.png" data-resource-id="assets_evento_2_png" />
+<meta name="ext-resource-dependency" content="assets/evento-3.png" data-resource-id="assets_evento_3_png" />
+<meta name="ext-resource-dependency" content="assets/ficha-preview.png" data-resource-id="assets_ficha_preview_png" />
+<meta name="ext-resource-dependency" content="assets/footer-cta-cocineros.jpg" data-resource-id="assets_footer_cta_cocineros_jpg" />
+<meta name="ext-resource-dependency" content="assets/hero-chef.png" data-resource-id="assets_hero_chef_png" />
+<meta name="ext-resource-dependency" content="assets/logo-fandit.png" data-resource-id="assets_logo_fandit_png" />
+<meta name="ext-resource-dependency" content="assets/logo-hacemos-cocina-negativo.svg" data-resource-id="assets_logo_hacemos_cocina_negativo_svg" />
+<meta name="ext-resource-dependency" content="assets/logo-hacemos-cocina.svg" data-resource-id="assets_logo_hacemos_cocina_svg" />
+<meta name="ext-resource-dependency" content="assets/logo-shifty.png" data-resource-id="assets_logo_shifty_png" />
+<meta name="ext-resource-dependency" content="assets/logo-tipi.png" data-resource-id="assets_logo_tipi_png" />
+<meta name="ext-resource-dependency" content="assets/pildora-1.png" data-resource-id="assets_pildora_1_png" />
+<meta name="ext-resource-dependency" content="assets/pildora-2.png" data-resource-id="assets_pildora_2_png" />
+<meta name="ext-resource-dependency" content="assets/pildora-3.png" data-resource-id="assets_pildora_3_png" />
+<meta name="ext-resource-dependency" content="assets/pildora-4.png" data-resource-id="assets_pildora_4_png" />
+<meta name="ext-resource-dependency" content="assets/pildora-5.png" data-resource-id="assets_pildora_5_png" />
+<meta name="ext-resource-dependency" content="assets/play.svg" data-resource-id="assets_play_svg" />
+<meta name="ext-resource-dependency" content="assets/podcast-1.png" data-resource-id="assets_podcast_1_png" />
+<meta name="ext-resource-dependency" content="assets/podcast-2.png" data-resource-id="assets_podcast_2_png" />
+<meta name="ext-resource-dependency" content="assets/podcast-3.png" data-resource-id="assets_podcast_3_png" />
+<meta name="ext-resource-dependency" content="assets/podcast-4.png" data-resource-id="assets_podcast_4_png" />
+<meta name="ext-resource-dependency" content="assets/podcast-5.png" data-resource-id="assets_podcast_5_png" />
+<meta name="ext-resource-dependency" content="assets/podcast-6.png" data-resource-id="assets_podcast_6_png" />
+<meta name="ext-resource-dependency" content="assets/solete-face.png" data-resource-id="assets_solete_face_png" />
+<meta name="ext-resource-dependency" content="assets/user-avatar.png" data-resource-id="assets_user_avatar_png" />
+<meta name="ext-resource-dependency" content="assets/volume-up.svg" data-resource-id="assets_volume_up_svg" />
+
+<script>
+(function() {
+  window.__assetMap = {};
+  var metas = document.querySelectorAll('meta[name="ext-resource-dependency"]');
+  for (var i = 0; i < metas.length; i++) {
+    var m = metas[i];
+    var origPath = m.getAttribute('content');
+    var id = m.getAttribute('data-resource-id');
+    var url = (window.__resources && window.__resources[id]) || origPath;
+    window.__assetMap[origPath] = url;
+  }
+  function resolve(v) {
+    if (typeof v !== 'string') return v;
+    if (window.__assetMap[v]) return window.__assetMap[v];
+    return v;
+  }
+  var imgProto = HTMLImageElement.prototype;
+  var imgDesc = Object.getOwnPropertyDescriptor(imgProto, 'src') || Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'src');
+  if (imgDesc && imgDesc.set) {
+    Object.defineProperty(imgProto, 'src', {
+      configurable: true,
+      enumerable: true,
+      get: function() { return imgDesc.get.call(this); },
+      set: function(v) { imgDesc.set.call(this, resolve(v)); }
+    });
+  }
+  var origSetAttr = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function(name, value) {
+    if ((name === 'src' || name === 'href' || name === 'xlink:href') && typeof value === 'string') {
+      value = resolve(value);
+    }
+    return origSetAttr.call(this, name, value);
+  };
+  function patchStyle(el) {
+    if (!el || !el.style) return;
+    var bg = el.style.backgroundImage;
+    if (bg && bg.indexOf('assets/') !== -1) {
+      var fixed = bg.replace(/url\(["']?(assets\/[^"')]+)["']?\)/g, function(_, p) {
+        return 'url("' + resolve(p) + '")';
+      });
+      if (fixed !== bg) el.style.backgroundImage = fixed;
+    }
+  }
+  var mo = new MutationObserver(function(records) {
+    for (var i = 0; i < records.length; i++) {
+      var r = records[i];
+      if (r.type === 'attributes' && r.attributeName === 'style') {
+        patchStyle(r.target);
+      } else if (r.type === 'childList') {
+        r.addedNodes.forEach(function(n) {
+          if (n.nodeType === 1) {
+            patchStyle(n);
+            n.querySelectorAll && n.querySelectorAll('[style*="assets/"]').forEach(patchStyle);
+          }
+        });
+      }
+    }
+  });
+  mo.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+})();
+</script>
+<script src="scripts/data.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="scripts/icons.jsx"></script>
+<script type="text/babel" src="scripts/sections-1.jsx"></script>
+<script type="text/babel" src="scripts/sections-2.jsx"></script>
+<script type="text/babel" src="scripts/embajadores.jsx"></script>
+<script type="text/babel" src="scripts/auth.jsx"></script>
+<script type="text/babel" src="scripts/private-area.jsx"></script>
+<script type="text/babel" src="scripts/app.jsx"></script>
+
+<template id="__bundler_thumbnail" data-bg-color="#FCB300">
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="800" fill="#FCB300"/>
+  <g transform="translate(600 400)">
+    <circle r="180" fill="#FFE249"/>
+    <g fill="#011E37">
+      <circle cx="-60" cy="-30" r="14"/>
+      <circle cx="60" cy="-30" r="14"/>
+      <path d="M -90 40 Q 0 110 90 40" stroke="#011E37" stroke-width="14" stroke-linecap="round" fill="none"/>
+    </g>
+  </g>
+  <text x="600" y="680" font-family="system-ui, sans-serif" font-size="42" font-weight="700" fill="#011E37" text-anchor="middle">Hacemos cocina</text>
+</svg>
+</template>
+</body>
+</html>

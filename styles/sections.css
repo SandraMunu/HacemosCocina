@@ -789,6 +789,56 @@
   margin: 8px 0 0;
   max-width: 32ch;
 }
+.embajador__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-family: var(--font-text);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-azul);
+  border-bottom: 1px solid var(--color-azul);
+  padding-bottom: 2px;
+  transition: opacity 200ms var(--ease-standard);
+}
+.embajador__link:hover { opacity: 0.72; color: var(--color-azul); }
+
+/* Become-an-ambassador CTA — wide card below the grid */
+.embajadores__cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 56px;
+  padding: 28px 40px;
+  border: 1px solid var(--border-low);
+  border-radius: 20px;
+  background: var(--background-03);
+}
+.embajadores__cta-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.embajadores__cta-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--color-azul);
+  margin: 0;
+}
+.embajadores__cta-sub {
+  font-size: 15px;
+  color: var(--content-02);
+  margin: 0;
+}
+.embajadores__cta-btn {
+  flex-shrink: 0;
+}
 @media (max-width: 900px) {
   .embajadores__grid { grid-template-columns: 1fr; gap: 40px; }
 }
@@ -838,10 +888,10 @@
   padding: 0 12px;
   border-radius: 999px;
   background: rgba(255,255,255,0.95);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-transform: none;
   color: var(--color-azul);
 }
 .article-card__body {
@@ -883,6 +933,16 @@
   width: 24px; height: 24px; border-radius: 50%; background: var(--navy-700);
 }
 .article-card__meta .sep { width: 3px; height: 3px; border-radius: 50%; background: var(--border-high); }
+
+/* Secondary audio CTA */
+.article-card__audio-btn {
+  align-self: flex-start;
+  margin-top: 4px;
+  gap: 8px;
+}
+.article-card__audio-btn svg {
+  color: var(--color-azul);
+}
 
 /* ============================================================
    Footer CTA + footer
@@ -960,7 +1020,7 @@
   background: var(--color-azul);
   color: #fff;
 }
-.footer-cta .btn--primary:hover { background: var(--navy-300); }
+.footer-cta .btn--primary:hover { background: var(--navy-300); color: #fff; }
 
 @media (max-width: 900px) {
   .footer-cta__inner { grid-template-columns: 1fr; }

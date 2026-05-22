@@ -1,362 +1,525 @@
-/* global React, HC_DATA, Nav, Hero, Eventos, Podcasts, Pildoras, Herramientas, Formaciones, Articulos, Embajadores, RegistrationModal, PrivateArea, Icon */
-const { useState, useEffect, useRef, useLayoutEffect } = React;
+/* global React, Hero, Eventos, Podcasts, Pildoras, Herramientas, Embajadores, Articulos, RegistrationModal, PrivateArea, Icon */
 
-// ============================================================
-// MobileHeader — replaces desktop .nav
-//   user      → {nombre, apellido} when logged in (shows profile pill)
-//   onLogo    → click on the brand logo (always navigates home)
-//   onProfile → click on profile pill (logged-in only; → área privada)
-//   onMenu    → open the side drawer
-// ============================================================
-const MobileHeader = ({ onMenu, onLogo, onProfile, user, dark = false }) => (
-  <header className="m-header" style={dark ? { background: "var(--color-azul)", color: "#fff", borderBottomColor: "rgba(255,255,255,0.08)" } : null}>
-    <button className="m-header__brand" onClick={onLogo} aria-label="Ir a la home">
-      <img className="m-header__logo" src={dark ? "assets/logo-hacemos-cocina-negativo.svg" : "assets/logo-hacemos-cocina.svg"} alt="Hacemos cocina" />
-    </button>
-    <div className="m-header__icons">
-      {user &&
-        <button className="m-profile-avatar" onClick={onProfile} aria-label="Ir a mi área privada">
-          <img src="assets/user-avatar.png" alt="Mi perfil" />
-        </button>
-      }
-      <button className="m-icon-btn m-icon-btn--fill" aria-label="Menú" onClick={onMenu}>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+/* ============================================================
+   useCarouselDots — finds matching grids on every render,
+   appends a .m-dots row after them, and wires scroll listeners.
+   ============================================================ */
+const useCarouselDots = (selector) => {
+  React.useEffect(() => {
+    const grids = Array.from(document.querySelectorAll(selector));
+    const cleanups = [];
+
+    grids.forEach((grid) => {
+      if (grid.dataset.mDotsBound) return;
+      grid.dataset.mDotsBound = '1';
+
+      const items = Array.from(grid.children).filter(
+        (c) => !c.classList.contains('m-dots')
+      );
+      const count = items.length;
+      if (count < 2) return;
+
+      const dotsEl = document.createElement('div');
+      dotsEl.className = 'm-dots';
+      grid.parentNode.insertBefore(dotsEl, grid.nextSibling);
+
+      const render = (a) => {
+        dotsEl.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+          const d = document.createElement('span');
+          d.className = 'm-dot' + (i === a ? ' is-active' : '');
+          dotsEl.appendChild(d);
+        }
+      };
+
+      const update = () => {
+        const cardW = grid.scrollWidth / count;
+        const a = Math.min(
+          count - 1,
+          Math.max(0, Math.round(grid.scrollLeft / cardW))
+        );
+        render(a);
+      };
+
+      render(0);
+      grid.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+
+      cleanups.push(() => {
+        grid.removeEventListener('scroll', update);
+        window.removeEventListener('resize', update);
+        delete grid.dataset.mDotsBound;
+        if (dotsEl.parentNode) dotsEl.parentNode.removeChild(dotsEl);
+      });
+    });
+
+    return () => cleanups.forEach((fn) => fn());
+  });
+};
+
+/* ============================================================
+   MOBILE HEADER
+   ============================================================ */
+const MobileHeader = ({ user, onMenu, onLogo, onProfile }) => (
+  <header className="m-header">
+    <a className="m-header__logo" href="#" onClick={(e) => { e.preventDefault(); onLogo && onLogo(); }} aria-label="Hacemos cocina">
+      <img src="assets/logo-hacemos-cocina.svg" alt="guía repsol | Hacemos cocina" />
+    </a>
+    <div className="m-header__actions">
+      <button type="button" className="m-icon-btn" aria-label="Buscar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
+        </svg>
       </button>
+      {user && (
+        <button type="button" className="m-pill-avatar" onClick={() => { window.__goPrivate && window.__goPrivate(); }} aria-label="Ir a tu área privada">
+          <img src="assets/user-avatar.png" alt="" />
+        </button>
+      )}
+      {onMenu && (
+        <button type="button" className="m-icon-btn" onClick={onMenu} aria-label="Menú">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M3 6h18M3 12h18M3 18h18" />
+          </svg>
+        </button>
+      )}
     </div>
   </header>
 );
 
-// ============================================================
-// MobileDrawer
-// ============================================================
-const MobileDrawer = ({ open, onClose, onAuth }) => {
-  if (!open) return null;
-  const links = ["Encuentros", "Podcast", "Herramientas", "Artículos"];
+/* ============================================================
+   DRAWER
+   ============================================================ */
+const MobileDrawer = ({ onClose, onRegister }) => {
+  React.useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+  const links = ['Encuentros', 'Podcast', 'Herramientas', 'Artículos'];
   return (
-    <div className="m-drawer">
-      <div className="m-drawer__head">
-        <img src="assets/logo-hacemos-cocina-negativo.svg" alt="" style={{ height: 22 }} />
-        <button className="m-drawer__close" onClick={onClose} aria-label="Cerrar">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
-        </button>
-      </div>
-      <nav className="m-drawer__nav">
-        {links.map((l) =>
-          <a key={l} href="#" className="m-drawer__link" onClick={(e) => { e.preventDefault(); onClose(); }}>
-            {l}
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 6l6 6-6 6" /></svg>
-          </a>
-        )}
-      </nav>
-      <div className="m-drawer__cta">
-        <button className="btn btn--primary" style={{ height: 52, width: "100%", justifyContent: "center" }} onClick={() => { onClose(); onAuth(); }}>Regístrate gratis</button>
-        <button className="btn btn--navy-outline" style={{ height: 52, width: "100%", justifyContent: "center" }} onClick={() => { onClose(); onAuth(); }}>Inicia sesión</button>
-      </div>
-    </div>);
+    <React.Fragment>
+      <div className="m-drawer-backdrop" onClick={onClose}></div>
+      <aside className="m-drawer" role="dialog" aria-label="Menú">
+        <div className="m-drawer__head">
+          <img src="assets/logo-hacemos-cocina-negativo.svg" alt="" />
+          <button type="button" className="m-drawer__close" onClick={onClose} aria-label="Cerrar">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+        <nav className="m-drawer__nav">
+          {links.map((l) => (
+            <a key={l} href="#" className="m-drawer__link" onClick={(e) => { e.preventDefault(); onClose(); }}>
+              {l}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </a>
+          ))}
+        </nav>
+        <div className="m-drawer__cta">
+          <button type="button" className="btn btn--primary" onClick={() => { onClose(); onRegister(); }}>
+            Regístrate gratis
+          </button>
+          <button type="button" className="btn btn--outline" onClick={() => { onClose(); onRegister(); }}>
+            Inicia sesión
+          </button>
+        </div>
+      </aside>
+    </React.Fragment>
+  );
 };
 
-// ============================================================
-// CarouselDots — JS-driven dots that track scroll position of a
-// horizontally scrolling rail. We add them just after the rail.
-// ============================================================
-const useCarouselDots = (railSelector) => {
-  useLayoutEffect(() => {
-    const rails = document.querySelectorAll(railSelector);
-    const cleanups = [];
-    rails.forEach((rail) => {
-      // Avoid duplicates
-      if (rail.dataset.dotsAttached) return;
-      rail.dataset.dotsAttached = "1";
-
-      const dotsWrap = document.createElement("div");
-      dotsWrap.className = "m-dots";
-
-      const children = Array.from(rail.children);
-      if (children.length < 2) return;
-
-      children.forEach((_, i) => {
-        const d = document.createElement("span");
-        d.className = "m-dot" + (i === 0 ? " is-active" : "");
-        dotsWrap.appendChild(d);
-      });
-      rail.parentElement.insertBefore(dotsWrap, rail.nextSibling);
-
-      const update = () => {
-        const slideW = children[0]?.getBoundingClientRect().width + 12 || 1;
-        const idx = Math.round(rail.scrollLeft / slideW);
-        const dots = dotsWrap.querySelectorAll(".m-dot");
-        dots.forEach((d, i) => d.classList.toggle("is-active", i === Math.min(idx, dots.length - 1)));
-      };
-      rail.addEventListener("scroll", update, { passive: true });
-      cleanups.push(() => {
-        rail.removeEventListener("scroll", update);
-        dotsWrap.remove();
-        delete rail.dataset.dotsAttached;
-      });
-    });
-    return () => cleanups.forEach((fn) => fn());
-  }, [railSelector]);
-};
-
-// ============================================================
-// MobileFooterCta — mobile version of desktop FooterCta
-// ============================================================
-const MobileFooterCta = ({ onAuth }) => (
+/* ============================================================
+   FOOTER CTA (mobile-only banner)
+   ============================================================ */
+const MobileFooterCta = ({ onCreate }) => (
   <section className="m-footer-cta">
-    <h2 className="m-footer-cta__title">Tu cocina, tu negocio, tu casa</h2>
-    <p className="m-footer-cta__lede">El espacio donde nos encontramos. Hacemos cocina de Guía Repsol.</p>
-    <button className="btn btn--navy" style={{ width: "100%", justifyContent: "center", height: 52 }} onClick={onAuth}>
-      Crear cuenta
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
-    </button>
     <div className="m-footer-cta__art">
       <img src="assets/footer-cta-cocineros.jpg" alt="" />
     </div>
+    <h2 className="m-footer-cta__title">Tu cocina, tu negocio, tu casa</h2>
+    <p className="m-footer-cta__lede">El espacio donde nos encontramos. Hacemos cocina de Guía Repsol.</p>
+    <button type="button" className="btn btn--primary m-footer-cta__btn" onClick={onCreate}>
+      Crear cuenta
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </button>
   </section>
 );
 
-// ============================================================
-// MobileFooter — accordion
-// ============================================================
+/* ============================================================
+   FOOTER (accordion)
+   ============================================================ */
+const MOBILE_FOOTER_GROUPS = [
+  { id: 'plat', title: 'Plataforma', items: ['Eventos', 'Podcast', 'Formación', 'Herramientas', 'Artículos'] },
+  { id: 'gr',   title: 'Guía Repsol', items: ['Restaurantes Soles', 'Soletes', 'Sol Sostenible', 'Recetas'] },
+  { id: 'help', title: 'Ayuda',      items: ['Contacto', 'Preguntas frecuentes', 'Para profesionales'] },
+  { id: 'leg',  title: 'Legal',      items: ['Política de privacidad', 'Política de cookies', 'Nota legal', 'Condiciones del servicio'] }
+];
+
 const MobileFooter = () => {
-  const groups = [
-    { id: "g1", title: "Plataforma", links: ["Eventos", "Podcast", "Formación", "Herramientas", "Artículos"] },
-    { id: "g2", title: "Guía Repsol", links: ["Restaurantes Soles", "Soletes", "Sol Sostenible", "Recetas"] },
-    { id: "g3", title: "Ayuda", links: ["Contacto", "Preguntas frecuentes", "Para profesionales"] },
-    { id: "g4", title: "Legal", links: ["Política de privacidad", "Política de cookies", "Nota legal", "Condiciones del servicio"] }
-  ];
-  const [open, setOpen] = useState(null);
+  const [open, setOpen] = React.useState(null);
   return (
     <footer className="m-footer">
-      <a className="m-footer__logo" href="#" aria-label="guía repsol — Hacemos cocina">
-        <img src="assets/logo-hacemos-cocina-negativo.svg" alt="" />
+      <a className="m-footer__logo" href="#" aria-label="Hacemos cocina">
+        <img src="assets/logo-hacemos-cocina-negativo.svg" alt="guía repsol | Hacemos cocina" />
       </a>
-      <p className="m-footer__desc">El espacio de todos los hosteleros. Hablamos como tú, desde el gremio, sin formalismos y sin rodeos.</p>
+      <p className="m-footer__desc">
+        El espacio de todos los hosteleros. Hablamos como tú, desde el gremio, sin formalismos y sin rodeos.
+      </p>
       <div className="m-footer__acc">
-        {groups.map((g) =>
-          <div key={g.id} className={"m-footer__group " + (open === g.id ? "is-open" : "")}>
-            <button className="m-footer__trigger" onClick={() => setOpen(open === g.id ? null : g.id)}>
+        {MOBILE_FOOTER_GROUPS.map((g) => (
+          <div key={g.id} className={'m-footer__group' + (open === g.id ? ' is-open' : '')}>
+            <button type="button" className="m-footer__group-head" onClick={() => setOpen(open === g.id ? null : g.id)}>
               {g.title}
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 9l6 6 6-6" /></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
             </button>
-            <div className="m-footer__body">
-              <div className="m-footer__body-inner">
-                {g.links.map((l) => <a key={l} href="#" className="m-footer__link">{l}</a>)}
-              </div>
-            </div>
+            <ul className="m-footer__group-list">
+              {g.items.map((it) => (
+                <li key={it}><a href="#">{it}</a></li>
+              ))}
+            </ul>
           </div>
-        )}
+        ))}
       </div>
-      <p className="m-footer__copy">© Repsol S.A. 2000 — 2026</p>
-    </footer>);
+      <div className="m-footer__bottom">
+        <span>© Repsol S.A. 2000 — 2026</span>
+      </div>
+    </footer>
+  );
 };
 
-// ============================================================
-// MobileHome — composes desktop section components + mobile chrome
-// ============================================================
-const MobileHome = ({ onMenu, onAuth, onProfile, onLogout, user }) => {
-  // Wire up carousel dots for the desktop grids that we've turned
-  // into horizontal rails via mobile.css.
-  useCarouselDots(".m-app .eventos__grid");
-  useCarouselDots(".m-app .articulos__grid");
-  useCarouselDots(".m-app .embajadores__grid");
-  useCarouselDots(".m-app .herramientas__grid");
-  useCarouselDots(".m-app .formacion__grid");
-  useCarouselDots(".m-app .pildoras__carousel");
+/* ============================================================
+   FAB (chat) for home-logueada
+   ============================================================ */
+const MobileFab = ({ onClick }) => (
+  <button type="button" className="m-fab" aria-label="Pregunta a Guía Repsol" onClick={onClick}>
+    <img src="assets/chat-voice.svg" alt="" aria-hidden="true" />
+    <span className="m-fab__badge" aria-hidden="true">
+      <img src="assets/ai-sparkle.svg" alt="" />
+    </span>
+  </button>
+);
 
-  // The Hero's "Regístrate" / "Inicia sesión" buttons live inside the
-  // shared desktop <Hero/> section, so we wire them up here via event
-  // delegation on the scrolling container.
-  const scrollRef = useRef(null);
-  useEffect(() => {
-    const el = scrollRef.current;
+/* ============================================================
+   MOBILE HOME
+   ============================================================ */
+const MobileHome = ({ onRegister, onLogin, onChat, showFab }) => {
+  // intercept hero CTA clicks via delegation
+  const heroRef = React.useRef(null);
+  React.useEffect(() => {
+    const el = heroRef.current;
     if (!el) return;
     const onClick = (e) => {
-      const btn = e.target.closest(".hero .btn--primary, .hero .btn--navy-outline");
-      if (!btn) return;
-      e.preventDefault();
-      onAuth();
+      const link = e.target.closest && e.target.closest('a.btn, button.btn');
+      if (!link) return;
+      const t = (link.textContent || '').trim();
+      if (/Inicia sesión/i.test(t)) {
+        e.preventDefault();
+        onLogin();
+      } else if (/Regístrate/i.test(t)) {
+        e.preventDefault();
+        onRegister();
+      }
     };
-    el.addEventListener("click", onClick);
-    return () => el.removeEventListener("click", onClick);
-  }, [onAuth]);
+    el.addEventListener('click', onClick);
+    return () => el.removeEventListener('click', onClick);
+  }, [onRegister, onLogin]);
+
+  // attach dots to all the carousels
+  useCarouselDots('.m-app .eventos__grid, .m-app .articulos__grid, .m-app .embajadores__grid, .m-app .herramientas__grid, .m-app .pildoras__carousel');
+
+  // Inject "Ver todos" button at the end of each section that has a section__see-all
+  React.useEffect(() => {
+    const sections = document.querySelectorAll('.m-app .section');
+    const added = [];
+    sections.forEach((sec) => {
+      const orig = sec.querySelector('.section__see-all');
+      if (!orig) return;
+      const wrap = sec.querySelector('.wrap');
+      if (!wrap || wrap.querySelector(':scope > .m-see-all')) return;
+      const label = (orig.textContent || 'Ver todos').replace(/\s+/g, ' ').trim();
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'm-see-all';
+      btn.textContent = label;
+      wrap.appendChild(btn);
+      added.push(btn);
+    });
+    return () => added.forEach((n) => n.remove());
+  });
 
   return (
-    <div className="m-view">
-      <MobileHeader onMenu={onMenu} onLogo={onLogout} onProfile={onProfile} user={user} />
-      <div className="m-scroll" ref={scrollRef}>
-        <Hero />
+    <React.Fragment>
+      <main>
+        <div ref={heroRef}><Hero /></div>
         <Eventos />
         <Podcasts />
         <Pildoras />
         <Herramientas />
-        <Articulos />
         <Embajadores />
-        <MobileFooterCta onAuth={onAuth} />
-        <MobileFooter />
-      </div>
-    </div>);
+        <Articulos />
+        <MobileFooterCta onCreate={onRegister} />
+      </main>
+      <MobileFooter />
+      {showFab && <MobileFab onClick={onChat} />}
+    </React.Fragment>
+  );
 };
 
-// ============================================================
-// MobileAuth — wraps desktop RegistrationModal, full screen
-// ============================================================
-const MobileAuth = ({ onClose, onComplete }) => (
-  <div className="m-view" style={{ background: "#fff" }}>
-    <RegistrationModal onClose={onClose} onComplete={onComplete} />
-  </div>
+/* ============================================================
+   MOBILE AUTH — wraps RegistrationModal
+   ============================================================ */
+const MobileAuth = ({ onClose, onComplete, authMode = 'register' }) => (
+  <RegistrationModal initialMode={authMode} onClose={onClose} onComplete={onComplete} />
 );
 
-// ============================================================
-// MobileChat — fullscreen overlay (replaces desktop chat-modal)
-// ============================================================
-const MobileChat = ({ user, onClose }) => {
-  useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-  return (
-    <div className="m-chat">
-      <div className="m-chat__head">
-        <h2 className="m-chat__title">¿Cómo podemos ayudarte?</h2>
-        <button className="m-chat__close" onClick={onClose} aria-label="Cerrar">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
-        </button>
-      </div>
-      <div className="m-chat__body">
-        <div className="m-bubble m-bubble--user"><p>Cómo puedo mejorar las reseñas negativas que me han puesto mis clientes?</p></div>
-        <div className="m-bubble m-bubble--bot"><p>Las 3 reviews negativas hacen mención de un problema con el servicio en sala en el turno de cena los fines de semana.</p></div>
-        <div className="m-chat__insights">
-          <article className="m-insight m-insight--green">
-            <span className="m-insight__label">Aprendizajes</span>
-            <p className="m-insight__text">En la mayor parte de los casos tiene que ver con personal con poca experiencia.</p>
-          </article>
-          <article className="m-insight m-insight--blue">
-            <span className="m-insight__label">Qué hacer</span>
-            <p className="m-insight__text">Revisa tu personal entre las fechas 11/05 al 13/05 en turno de noche</p>
-          </article>
-        </div>
-        <section className="m-chat__related">
-          <div className="m-chat__related-head">
-            <img src="assets/solete-sol.png" alt="" />
-            Otros Soletes hicieron
-          </div>
-          {[
-            { name: "Casa Manolo", meta: "Cambió los turnos de cena los fines de semana" },
-            { name: "El Rincón de Lola", meta: "Reorganizó el equipo de sala" }
-          ].map((r) =>
-            <div key={r.name} className="m-chat__related-item">
-              <div>
-                <div className="m-chat__related-name">{r.name}</div>
-                <div className="m-chat__related-sub">{r.meta}</div>
-              </div>
-              <button className="m-chat__more" aria-label="Más">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
-              </button>
-            </div>
-          )}
-        </section>
-      </div>
-      <div className="m-chat__foot">
-        <button className="m-chat__action m-chat__action--secondary" aria-label="Subir">
-          <img src="assets/chat-upload.svg" alt="" width="22" height="22" />
-        </button>
-        <button className="m-chat__action m-chat__action--primary" aria-label="Voz">
-          <img src="assets/chat-voice-icon.svg" alt="" width="26" height="26" />
-        </button>
-        <button className="m-chat__action m-chat__action--secondary" aria-label="Teclado">
-          <img src="assets/chat-keyboard.svg" alt="" width="22" height="22" />
-        </button>
-      </div>
-    </div>);
-};
+/* ============================================================
+   MOBILE PRIVATE — wraps PrivateArea and appends footnav block
+   ============================================================ */
+const MobilePrivate = ({ user, onLogout, onGoHome }) => {
+  // Use a React portal so the footnav lives inside .pa-content but React
+  // still owns the node — otherwise unmount throws a removeChild error.
+  const [paContent, setPaContent] = React.useState(null);
+  React.useEffect(() => {
+    const find = () => {
+      const el = document.querySelector('.m-app .pa-content');
+      if (el) { setPaContent(el); return true; }
+      return false;
+    };
+    if (!find()) {
+      const id = setInterval(() => { if (find()) clearInterval(id); }, 50);
+      return () => clearInterval(id);
+    }
+  }, []);
 
-// ============================================================
-// MobilePrivate — wraps desktop PrivateArea, single column
-// ============================================================
-const MobilePrivate = ({ user, onLogout, onHome, onMenu, onChat }) => {
-  // Carousel dots inside PA themes
-  useCarouselDots(".m-app .pa-themes");
-
-  // Click handler bridge: when the desktop FAB is clicked, open mobile chat
-  useEffect(() => {
-    const fab = document.querySelector(".m-app .pa-chat-fab");
-    if (!fab) return;
-    const onClick = (e) => { e.preventDefault(); e.stopPropagation(); onChat(); };
-    fab.addEventListener("click", onClick, true);
-    return () => fab.removeEventListener("click", onClick, true);
-  }, [onChat]);
-
-  // Wire the "Cerrar sesión" link inside the PA side rail.
-  const scrollRef = useRef(null);
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
+  // Intercept clicks on the desktop Nav logo (inside PrivateArea) to go home
+  React.useEffect(() => {
     const onClick = (e) => {
-      const link = e.target.closest(".pa-rail__link");
-      if (!link) return;
-      if (link.textContent.trim().startsWith("Cerrar sesi\u00f3n")) {
+      const brand = e.target.closest && e.target.closest('.m-app .nav__brand');
+      if (brand) {
         e.preventDefault();
-        onLogout();
+        onGoHome();
       }
     };
-    el.addEventListener("click", onClick);
-    return () => el.removeEventListener("click", onClick);
-  }, [onLogout]);
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, [onGoHome]);
+
+  const footnav = (
+    <div className="m-pa-footnav" role="navigation" aria-label="Acciones de cuenta">
+      <button type="button" className="m-pa-footnav__item" onClick={(e) => { e.preventDefault(); window.__editProfile && window.__editProfile(); }}>
+        <span>Editar perfil</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M9 6l6 6-6 6" />
+        </svg>
+      </button>
+      <button type="button" className="m-pa-footnav__item" onClick={(e) => { e.preventDefault(); window.__viewEstablishments && window.__viewEstablishments(); }}>
+        <span>Ver datos de los establecimientos</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M9 6l6 6-6 6" />
+        </svg>
+      </button>
+      <button type="button" className="m-pa-footnav__item m-pa-footnav__item--danger" onClick={onLogout}>
+        <span>Cerrar sesión</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M15 17l5-5-5-5M20 12H9M12 19v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+        </svg>
+      </button>
+    </div>
+  );
 
   return (
-    <div className="m-view" style={{ background: "#fff" }}>
-      <MobileHeader onMenu={onMenu} onLogo={onHome} onProfile={() => {}} user={user} />
-      <div className="m-scroll" ref={scrollRef}>
-        <PrivateArea user={user} onLogout={onLogout} />
-      </div>
-    </div>);
+    <React.Fragment>
+      <PrivateArea user={user} onLogout={onLogout} />
+      {paContent && ReactDOM.createPortal(footnav, paContent)}
+    </React.Fragment>
+  );
 };
 
-// ============================================================
-// ROOT
-//
-// View flow:
-//   home(logged-out)  → [banner Regístrate]   → auth
-//   auth              → [Crear cuenta]        → home(logged-in)
-//   home(logged-in)   → [profile pill click]  → private
-//   private           → [Cerrar sesión]       → home(logged-out)
-//   home / private    → [logo click]          → home
-// ============================================================
+/* ============================================================
+   MOBILE APP ROOT
+   ============================================================ */
 const MobileApp = () => {
-  const [view, setView] = useState("home"); // home | auth | private
-  const [drawer, setDrawer] = useState(false);
-  const [chat, setChat] = useState(false);
-  const [user, setUser] = useState(null);
+  const [view, setView] = React.useState('home');
+  const [authMode, setAuthMode] = React.useState('register'); // 'register' | 'login'
+  const [user, setUser] = React.useState(null);
+  const [drawer, setDrawer] = React.useState(false);
+  const [chatOpen, setChatOpen] = React.useState(false);
 
-  const onAuth = () => setView("auth");
-  // After registration, drop the user back on the home with a logged-in header.
-  const onAuthDone = (u) => { setUser(u); setView("home"); };
-  const onLogout = () => { setUser(null); setView("home"); setChat(false); };
-  const onHome = () => { setChat(false); setDrawer(false); setView("home"); };
-  const onProfile = () => { setChat(false); setDrawer(false); setView("private"); };
+  React.useEffect(() => {
+    window.__openRegister = () => { setAuthMode('register'); setView('auth'); };
+    window.__openLogin = () => { setAuthMode('login'); setView('auth'); };
+    window.__goHome = () => { setView('home'); window.scrollTo(0, 0); };
+    window.__goPrivate = () => { setView('private'); window.scrollTo(0, 0); };
+    window.__viewEstablishments = () => { setView('establishments'); window.scrollTo(0, 0); };
+    window.__editProfile = () => { setView('edit-profile'); window.scrollTo(0, 0); };
+    return () => {
+      delete window.__openRegister; delete window.__openLogin;
+      delete window.__goHome; delete window.__goPrivate;
+      delete window.__viewEstablishments; delete window.__editProfile;
+    };
+  }, []);
+
+  // Notify parent (device frame) when a chat overlay is present in the DOM,
+  // so it can recolor the iOS status bar to match.
+  React.useEffect(() => {
+    const post = (color) => {
+      try { window.parent.postMessage({ type: 'm-status-bg', color }, '*'); } catch (e) {}
+    };
+    const sync = () => {
+      const present = !!document.querySelector('.chat-modal');
+      post(present ? '#FCB300' : '#ffffff');
+    };
+    sync();
+    const obs = new MutationObserver(sync);
+    obs.observe(document.body, { childList: true, subtree: true });
+    return () => { obs.disconnect(); post('#ffffff'); };
+  }, []);
+
+  // Esc closes overlays
+  React.useEffect(() => {
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return;
+      if (chatOpen) setChatOpen(false);
+      else if (drawer) setDrawer(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [chatOpen, drawer]);
+
+  const handleComplete = (data) => {
+    setUser(data);
+    setView('private');
+    window.scrollTo(0, 0);
+  };
+
+  const goHomeLogout = () => {
+    setUser(null);
+    setView('home');
+    window.scrollTo(0, 0);
+  };
+
+  const goHomeKeepUser = () => {
+    setView('home');
+    window.scrollTo(0, 0);
+  };
+
+  const goPrivate = () => {
+    if (!user) return;
+    setView('private');
+    window.scrollTo(0, 0);
+  };
+
+  // ---- Header config per view
+  let header = null;
+  if (view === 'home') {
+    header = (
+      <MobileHeader
+        user={user}
+        onMenu={() => setDrawer(true)}
+        onLogo={user ? goHomeLogout : undefined}
+        onProfile={goPrivate}
+      />
+    );
+  } else if (view === 'private') {
+    header = (
+      <MobileHeader
+        user={user}
+        onMenu={() => setDrawer(true)}
+        onLogo={goHomeKeepUser}
+        onProfile={() => {}}
+      />
+    );
+  } else if (view === 'establishments' || view === 'edit-profile') {
+    header = (
+      <MobileHeader
+        user={user}
+        onMenu={() => setDrawer(true)}
+        onLogo={goHomeKeepUser}
+        onProfile={() => { setView('private'); window.scrollTo(0, 0); }}
+      />
+    );
+  }
 
   return (
-    <div className="m-app">
-      {view === "home" &&
+    <div className={'m-app' + (typeof window !== 'undefined' && /[?&]frame=ios/.test(window.location.search) ? ' m-app--framed' : '')}>
+      {header}
+
+      {view === 'home' && (
         <MobileHome
+          onRegister={() => { setAuthMode('register'); setView('auth'); }}
+          onLogin={() => { setAuthMode('login'); setView('auth'); }}
+          onChat={() => setChatOpen(true)}
+          showFab={true}
+        />
+      )}
+
+      {chatOpen && view === 'home' && (
+        <ChatModal
           user={user}
-          onMenu={() => setDrawer(true)}
-          onAuth={onAuth}
-          onProfile={onProfile}
-          onLogout={onLogout} />}
-      {view === "auth" && <MobileAuth onClose={() => setView("home")} onComplete={onAuthDone} />}
-      {view === "private" &&
+          onClose={() => setChatOpen(false)}
+          onRegister={() => setView('auth')}
+        />
+      )}
+
+      {view === 'auth' && (
+        <MobileAuth
+          authMode={authMode}
+          onClose={() => setView(user ? 'private' : 'home')}
+          onComplete={handleComplete}
+        />
+      )}
+
+      {view === 'private' && user && (
         <MobilePrivate
-          user={user || { nombre: "Ane", apellido: "G." }}
-          onLogout={onLogout}
-          onHome={onHome}
-          onMenu={() => setDrawer(true)}
-          onChat={() => setChat(true)} />}
-      {drawer && <MobileDrawer open={drawer} onClose={() => setDrawer(false)} onAuth={onAuth} />}
-      {chat && <MobileChat user={user} onClose={() => setChat(false)} />}
-    </div>);
+          user={user}
+          onLogout={goHomeLogout}
+          onGoHome={goHomeKeepUser}
+        />
+      )}
+
+      {view === 'establishments' && (
+        <EstablishmentsPage
+          embedded
+          user={user || { nombre: 'Ane', apellido: 'G.' }}
+          onBack={() => { setView('private'); window.scrollTo(0, 0); }}
+        />
+      )}
+
+      {view === 'edit-profile' && (
+        <EditProfilePage
+          embedded
+          user={user || { nombre: 'Ane', apellido: 'G.' }}
+          onBack={() => { setView('private'); window.scrollTo(0, 0); }}
+        />
+      )}
+
+      {drawer && (
+        <MobileDrawer
+          onClose={() => setDrawer(false)}
+          onRegister={() => setView('auth')}
+        />
+      )}
+    </div>
+  );
 };
 
-window.MobileApp = MobileApp;
+Object.assign(window, {
+  MobileApp,
+  MobileHeader,
+  MobileDrawer,
+  MobileFooterCta,
+  MobileFooter,
+  MobileFab,
+  MobileHome,
+  MobileAuth,
+  MobilePrivate,
+  useCarouselDots
+});

@@ -1,9 +1,11 @@
 /* global React, Icon, HC_DATA */
 
-// ---------------- REGISTRATION (full screen, 3 steps) ----------------
-const RegistrationModal = ({ onClose, onComplete }) => {
-  const [step, setStep] = React.useState(1);
+// ---------------- REGISTRATION (full screen, 3 steps + login) ----------------
+const RegistrationModal = ({ onClose, onComplete, initialMode = "register" }) => {
+  const [step, setStep] = React.useState(initialMode === "login" ? "login-email" : 1);
   const [showPwd, setShowPwd] = React.useState(false);
+  const [showLoginPwd, setShowLoginPwd] = React.useState(false);
+  const [loginError, setLoginError] = React.useState(false);
   const [d, setD] = React.useState({
     nombre: "", apellido: "", telefono: "", email: "", password: "",
     establecimiento: "", tipo: "Bar / Cafetería", direccion: ""
@@ -29,7 +31,7 @@ const RegistrationModal = ({ onClose, onComplete }) => {
   return (
     <div className="auth-page">
       <header className="auth-page__nav">
-        <a className="auth-page__brand" href="#" onClick={(e) => {e.preventDefault();onClose && onClose();}} aria-label="guía repsol — Hacemos cocina">
+        <a className="auth-page__brand" href="#" onClick={(e) => {e.preventDefault(); if (window.__goHome) window.__goHome(); else if (onClose) onClose();}} aria-label="guía repsol — Hacemos cocina">
           <img src="assets/logo-hacemos-cocina.svg" alt="guía repsol | Hacemos cocina" />
         </a>
         <button className="auth-page__close" aria-label="Cerrar" onClick={onClose}>
@@ -39,7 +41,7 @@ const RegistrationModal = ({ onClose, onComplete }) => {
 
       <div className="auth-page__main">
         <div className="auth-page__form">
-          {step > 1 &&
+          {(step === 2 || step === 3) &&
           <div className="auth-page__steps">
             <div className={"auth-step " + (step >= 1 ? "is-active" : "")}>
               <span className="auth-step__num">1</span><span className="auth-step__label">Empieza</span>
@@ -51,6 +53,49 @@ const RegistrationModal = ({ onClose, onComplete }) => {
             <span className="auth-step__sep"></span>
             <div className={"auth-step " + (step >= 3 ? "is-active" : "")}>
               <span className="auth-step__num">3</span><span className="auth-step__label">Tu establecimiento</span>
+            </div>
+          </div>
+          }
+
+          {step === "login-email" &&
+          <div className="auth-page__body">
+            <h1 className="auth-page__title">Inicia sesión</h1>
+            <div className="auth-social">
+              <button className="auth-social__btn" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.5c0-2.85 2.32-4.21 2.42-4.27-1.32-1.93-3.38-2.19-4.11-2.22-1.75-.18-3.41 1.03-4.3 1.03-.9 0-2.26-1.01-3.71-.98-1.91.03-3.67 1.11-4.65 2.82-1.98 3.43-.51 8.5 1.42 11.3.94 1.36 2.07 2.89 3.55 2.83 1.43-.06 1.97-.92 3.7-.92s2.21.92 3.72.89c1.54-.03 2.51-1.39 3.45-2.75 1.08-1.58 1.53-3.12 1.55-3.2-.03-.02-2.98-1.14-3.04-4.53zm-2.83-8.32c.78-.95 1.31-2.27 1.17-3.58-1.13.05-2.5.75-3.31 1.69-.72.83-1.36 2.18-1.19 3.46 1.26.1 2.55-.64 3.33-1.57z" /></svg>Apple</button>
+              <button className="auth-social__btn" type="button"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4c-.2 1.2-1 2.3-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z" /><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1H3.1v2.6C4.7 19.7 8.1 22 12 22z" /><path fill="#FBBC04" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1c-.7 1.4-1.1 3-1.1 4.6 0 1.6.4 3.2 1.1 4.6L6.4 14z" /><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.8-2.8C16.9 3 14.7 2 12 2 8.1 2 4.7 4.3 3.1 7.4L6.4 10c.8-2.4 3-4.1 5.6-4.1z" /></svg>Google</button>
+              <button className="auth-social__btn" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12c0-6.6-5.4-12-12-12S0 5.4 0 12c0 6 4.4 11 10.1 11.9V15.5H7.1V12h3v-2.6c0-3 1.8-4.6 4.5-4.6 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4C19.6 23 24 18 24 12z" /></svg>Facebook</button>
+            </div>
+            <div className="auth-divider"><span>o con tu correo</span></div>
+            <div className="auth-grid">
+              <div className="field field--float field--full"><input id="f-email-login" type="email" placeholder=" " value={d.email} onChange={set("email")} /><label htmlFor="f-email-login">Correo electrónico*</label></div>
+            </div>
+            <p className="auth-terms">Al continuar, aceptas las <a href="#">Condiciones del servicio</a> del Servicio Online de Guía Repsol y confirmas que has leído la <a href="#">Política de privacidad</a>.</p>
+            <div className="auth-actions">
+              <button className="btn btn--primary" onClick={() => setStep("login-pass")}>Continuar <Icon name="arrow" size={16} /></button>
+            </div>
+          </div>
+          }
+
+          {step === "login-pass" &&
+          <div className="auth-page__body">
+            <h1 className="auth-page__title">Ya estás dentro de Guía Repsol Hacemos Cocina</h1>
+            <p className="auth-page__lede">Introduce tu contraseña para acceder con <strong>{d.email}</strong>.</p>
+            <div className="auth-grid">
+              <div className="field field--float field--full field--pwd">
+                <input id="f-loginpass" type={showLoginPwd ? "text" : "password"} placeholder=" " value={d.password} onChange={(e) => { setLoginError(false); set("password")(e); }} />
+                <label htmlFor="f-loginpass">Contraseña</label>
+                <button type="button" className="field__eye" aria-label={showLoginPwd ? "Ocultar contraseña" : "Mostrar contraseña"} onClick={() => setShowLoginPwd(!showLoginPwd)}>
+                  <Eye open={showLoginPwd} />
+                </button>
+              </div>
+              {loginError && <p className="auth-error">La contraseña no es correcta. Inténtalo de nuevo.</p>}
+              <a href="#" className="auth-forgot">¿Has olvidado tu contraseña?</a>
+            </div>
+            <div className="auth-actions">
+              <button className="btn btn--ghost" onClick={() => setStep("login-email")}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M19 12H5M11 18l-6-6 6-6" /></svg> Atrás</button>
+              <button className="btn btn--primary" onClick={() => {
+                onComplete({ ...d, nombre: d.nombre || "Ane", apellido: d.apellido || "G." });
+              }}>Entrar <Icon name="arrow" size={16} /></button>
             </div>
           </div>
           }
@@ -113,15 +158,7 @@ const RegistrationModal = ({ onClose, onComplete }) => {
             <p className="auth-page__lede">Pon tu negocio en el radar.</p>
             <div className="auth-grid auth-grid--two">
               <div className="field field--float field--full"><input id="f-estab" type="text" placeholder=" " value={d.establecimiento} onChange={set("establecimiento")} /><label htmlFor="f-estab">Nombre del establecimiento</label></div>
-              <div className="field field--full field--chips"><span className="field-label">Tipo de establecimiento</span>
-                <div className="auth-chips">
-                  {["Bares, tascas y barras", "Cafeterías y pastelerías", "Fast good", "Heladerías", "Restaurante", "Terraza", "Vinotecas, bodegas y sidrerías"].map((t) =>
-                  <button type="button" key={t} className={"auth-chip " + (d.tipo === t ? "is-active" : "")} onClick={() => setD({ ...d, tipo: t })}>{t}</button>
-                  )}
-                </div>
-              </div>
               <div className="field field--float"><input id="f-cif" type="text" placeholder=" " value={d.cif || ""} onChange={set("cif")} /><label htmlFor="f-cif">CIF</label></div>
-              <div className="field field--float"><input id="f-telpub" type="tel" placeholder=" " value={d.telPublico || ""} onChange={set("telPublico")} /><label htmlFor="f-telpub">Teléfono público</label></div>
               <div className="field field--float field--full"><input id="f-dir" type="text" placeholder=" " value={d.direccion} onChange={set("direccion")} /><label htmlFor="f-dir">Dirección</label></div>
               <div className="field field--float"><input id="f-cp" type="text" inputMode="numeric" placeholder=" " value={d.cp || ""} onChange={set("cp")} /><label htmlFor="f-cp">Código postal</label></div>
               <div className="field field--float"><input id="f-mun" type="text" placeholder=" " value={d.municipio || ""} onChange={set("municipio")} /><label htmlFor="f-mun">Municipio y provincia</label></div>
@@ -141,7 +178,19 @@ const RegistrationModal = ({ onClose, onComplete }) => {
                   <option key={c} value={c}>{c}</option>
                   )}
                 </select>
-                <label htmlFor="f-cargo">Cargo</label>
+                <label htmlFor="f-cargo">Función</label>
+              </div>
+              <div className="field field--full field--gestor">
+                <span className="field-label">¿Eres el gestor del establecimiento?</span>
+                <div className="auth-radio-row">
+                  {["Sí", "No"].map((opt) =>
+                  <label key={opt} className={"auth-radio " + (d.gestor === opt ? "is-active" : "")}>
+                    <input type="radio" name="gestor" value={opt} checked={d.gestor === opt} onChange={() => setD({ ...d, gestor: opt })} />
+                    <span className="auth-radio__mark" aria-hidden="true"></span>
+                    <span className="auth-radio__label">{opt}</span>
+                  </label>
+                  )}
+                </div>
               </div>
             </div>
             <div className="auth-actions">

@@ -29,7 +29,7 @@ const Embajadores = () =>
     <div className="wrap">
       <div className="section__header">
         <div className="section__heading">
-          <h2 className="section__title">Nuestros embajadores</h2>
+          <h2 className="section__title">Personas que apoyan este proyecto</h2>
           <p className="section__subtitle">De sala, cocina y gestión: experiencias reales de quienes ya han estado ahí.</p>
         </div>
       </div>
@@ -42,8 +42,19 @@ const Embajadores = () =>
             <h3 className="embajador__name">{e.name}</h3>
             <p className="embajador__role">{e.role}</p>
             <p className="embajador__bio">{e.bio}</p>
+            <a className="embajador__link" href="#">
+              Saber más
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </a>
           </article>
       )}
+      </div>
+      <div className="embajadores__cta">
+        <div className="embajadores__cta-copy">
+          <h3 className="embajadores__cta-title">¿Quieres ser parte de esta red?</h3>
+          <p className="embajadores__cta-sub">Cuéntanos tu proyecto</p>
+        </div>
+        <a className="btn btn--ghost embajadores__cta-btn" href="#">Mandar solicitud</a>
       </div>
     </div>
   </section>;
