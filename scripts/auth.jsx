@@ -1,13 +1,14 @@
 /* global React, Icon, HC_DATA */
 
 // ---------------- REGISTRATION (full screen, 3 steps + login) ----------------
-const RegistrationModal = ({ onClose, onComplete, initialMode = "register" }) => {
-  const [step, setStep] = React.useState(initialMode === "login" ? "login-email" : 1);
+const RegistrationModal = ({ onClose, onComplete, initialMode = "register", initialEmail = "", initialName = "" }) => {
+  const startStep = initialMode === "login" ? "login-email" : initialMode === "verify" ? "verify" : 1;
+  const [step, setStep] = React.useState(startStep);
   const [showPwd, setShowPwd] = React.useState(false);
   const [showLoginPwd, setShowLoginPwd] = React.useState(false);
   const [loginError, setLoginError] = React.useState(false);
   const [d, setD] = React.useState({
-    nombre: "", apellido: "", telefono: "", email: "", password: "",
+    nombre: initialName, apellido: "", telefono: "", email: initialEmail, password: "",
     establecimiento: "", tipo: "Bar / Cafetería", direccion: ""
   });
   const set = (k) => (e) => setD({ ...d, [k]: e.target.value });
@@ -31,7 +32,7 @@ const RegistrationModal = ({ onClose, onComplete, initialMode = "register" }) =>
   return (
     <div className="auth-page">
       <header className="auth-page__nav">
-        <a className="auth-page__brand" href="#" onClick={(e) => {e.preventDefault(); if (window.__goHome) window.__goHome(); else if (onClose) onClose();}} aria-label="guía repsol — Hacemos cocina">
+        <a className="auth-page__brand" href="#" onClick={(e) => {e.preventDefault();if (window.__goHome) window.__goHome();else if (onClose) onClose();}} aria-label="guía repsol — Hacemos cocina">
           <img src="assets/logo-hacemos-cocina.svg" alt="guía repsol | Hacemos cocina" />
         </a>
         <button className="auth-page__close" aria-label="Cerrar" onClick={onClose}>
@@ -78,11 +79,11 @@ const RegistrationModal = ({ onClose, onComplete, initialMode = "register" }) =>
 
           {step === "login-pass" &&
           <div className="auth-page__body">
-            <h1 className="auth-page__title">Ya estás dentro de Guía Repsol Hacemos Cocina</h1>
+            <h1 className="auth-page__title">Ya formas parte de Guía Repsol Hacemos cocina</h1>
             <p className="auth-page__lede">Introduce tu contraseña para acceder con <strong>{d.email}</strong>.</p>
             <div className="auth-grid">
               <div className="field field--float field--full field--pwd">
-                <input id="f-loginpass" type={showLoginPwd ? "text" : "password"} placeholder=" " value={d.password} onChange={(e) => { setLoginError(false); set("password")(e); }} />
+                <input id="f-loginpass" type={showLoginPwd ? "text" : "password"} placeholder=" " value={d.password} onChange={(e) => {setLoginError(false);set("password")(e);}} />
                 <label htmlFor="f-loginpass">Contraseña</label>
                 <button type="button" className="field__eye" aria-label={showLoginPwd ? "Ocultar contraseña" : "Mostrar contraseña"} onClick={() => setShowLoginPwd(!showLoginPwd)}>
                   <Eye open={showLoginPwd} />
@@ -165,7 +166,7 @@ const RegistrationModal = ({ onClose, onComplete, initialMode = "register" }) =>
               <div className="field field--float field--full">
                 <select id="f-ccaa" className={d.ccaa ? "is-filled" : ""} value={d.ccaa || ""} onChange={set("ccaa")}>
                   <option value="" disabled hidden></option>
-                  {["Andalucía","Aragón","Asturias","Baleares","Canarias","Cantabria","Castilla-La Mancha","Castilla y León","Cataluña","Ceuta","Comunidad Valenciana","Extremadura","Galicia","La Rioja","Madrid","Melilla","Murcia","Navarra","País Vasco"].map((c) =>
+                  {["Andalucía", "Aragón", "Asturias", "Baleares", "Canarias", "Cantabria", "Castilla-La Mancha", "Castilla y León", "Cataluña", "Ceuta", "Comunidad Valenciana", "Extremadura", "Galicia", "La Rioja", "Madrid", "Melilla", "Murcia", "Navarra", "País Vasco"].map((c) =>
                   <option key={c} value={c}>{c}</option>
                   )}
                 </select>
@@ -174,7 +175,7 @@ const RegistrationModal = ({ onClose, onComplete, initialMode = "register" }) =>
               <div className="field field--float field--full">
                 <select id="f-cargo" className={d.cargo ? "is-filled" : ""} value={d.cargo || ""} onChange={set("cargo")}>
                   <option value="" disabled hidden></option>
-                  {["Administración","Agencia comunicación","Asesor gastronómico","Director de sala","Gerente","Jefe/a de cocina","Pastelero/a","Propietario/a","Sumiller"].map((c) =>
+                  {["Administración", "Agencia comunicación", "Asesor gastronómico", "Director de sala", "Gerente", "Jefe/a de cocina", "Pastelero/a", "Propietario/a", "Sumiller"].map((c) =>
                   <option key={c} value={c}>{c}</option>
                   )}
                 </select>
@@ -195,7 +196,48 @@ const RegistrationModal = ({ onClose, onComplete, initialMode = "register" }) =>
             </div>
             <div className="auth-actions">
               <button className="btn btn--ghost" onClick={() => setStep(2)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M19 12H5M11 18l-6-6 6-6" /></svg> Atrás</button>
-              <button className="btn btn--primary" onClick={() => onComplete(d)}>Crear cuenta <Icon name="arrow" size={16} /></button>
+              <button className="btn btn--primary" onClick={() => setStep("verify")}>Crear cuenta <Icon name="arrow" size={16} /></button>
+            </div>
+          </div>
+          }
+
+          {step === "verify" &&
+          <div className="auth-page__body">
+            <div className="auth-icon auth-icon--mail" aria-hidden="true">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="m3 7 9 6 9-6" />
+              </svg>
+            </div>
+            <h1 className="auth-page__title">Verifica tu correo</h1>
+            <p className="auth-page__lede">Te hemos enviado un correo a <strong>{d.email || "tu cuenta"}</strong> con un enlace para activar tu cuenta. Haz click en él para terminar el registro.</p>
+            <div className="auth-verify__hint">
+              <span>¿No te ha llegado? Revisa la carpeta de spam o vuelve a enviarlo</span>
+              <a href="#" onClick={(e) => e.preventDefault()}></a>.
+            </div>
+            <div className="auth-actions auth-actions--stack">
+              <button className="btn btn--primary" onClick={() => onComplete({ ...d, __welcome: true })}>Abrir el correo</button>
+              <button className="btn btn--ghost" onClick={() => setStep(3)}>Volver a enviar</button>
+            </div>
+          </div>
+          }
+
+          {step === "welcome" &&
+          <div className="auth-page__body auth-page__body--center">
+            <div className="auth-icon auth-icon--success" aria-hidden="true">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12.5 10 17 19 7" />
+              </svg>
+            </div>
+            <h1 className="auth-page__title">{d.nombre ? `¡Bienvenido, ${d.nombre}!` : "¡Bienvenido!"}</h1>
+            <p className="auth-page__lede">Tu cuenta está activa y ya formas parte de <strong>Hacemos cocina</strong>. Acabas de unirte a una comunidad de más de 1.000 hosteleros.</p>
+            <ul className="auth-welcome__list">
+              <li><Check />Gestiona tu ficha y reseñas</li>
+              <li><Check />Apúntate a eventos y formaciones</li>
+              <li><Check />Accede a herramientas exclusivas</li>
+            </ul>
+            <div className="auth-actions auth-actions--stack">
+              <button className="btn btn--primary" onClick={() => onComplete(d)}>Entrar a la plataforma <Icon name="arrow" size={16} /></button>
             </div>
           </div>
           }
@@ -203,7 +245,7 @@ const RegistrationModal = ({ onClose, onComplete, initialMode = "register" }) =>
         <aside className="auth-page__aside" aria-label="Sobre Hacemos cocina">
           <div className="auth-aside__inner">
             <span className="auth-aside__overline">Hacemos cocina</span>
-            <h2 className="auth-aside__title">Tu día a día, tu Guía Repsol</h2>
+            <h2 className="auth-aside__title">Tu día a día, tu espacio en Guía Repsol</h2>
             <p className="auth-aside__lede">El lugar donde conectas con otros hosteleros, compartes experiencias y resuelves tu día a día con las herramientas que necesitas.
 
             </p>
@@ -232,3 +274,43 @@ const RegistrationModal = ({ onClose, onComplete, initialMode = "register" }) =>
     </div>);};
 
 window.RegistrationModal = RegistrationModal;
+
+// ---------------- WELCOME MODAL ----------------
+const WelcomeModal = ({ onClose }) => {
+  // Lock body scroll while open
+  React.useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {document.body.style.overflow = prev;};
+  }, []);
+
+  // Close on Esc
+  React.useEffect(() => {
+    const onKey = (e) => {if (e.key === "Escape") onClose && onClose();};
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div className="welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+      <div className="welcome-modal__backdrop" onClick={onClose}></div>
+      <div className="welcome-modal__card">
+        <button type="button" className="welcome-modal__close" aria-label="Cerrar" onClick={onClose}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+            <path d="M6 6l12 12M18 6 6 18" />
+          </svg>
+        </button>
+        <div className="welcome-modal__icon" aria-hidden="true">
+          <img src="assets/welcome-illustration.svg" alt="" />
+        </div>
+        <h2 id="welcome-title" className="welcome-modal__title" style={{ fontWeight: "400" }}>¡Te damos la bienvenida a Guía Repsol Hacemos cocina!</h2>
+        <p className="welcome-modal__lede">Ahora puedes acceder a tu área privada</p>
+        <button type="button" className="btn btn--primary welcome-modal__cta" onClick={onClose}>Comenzar
+
+        </button>
+      </div>
+    </div>);
+
+};
+
+window.WelcomeModal = WelcomeModal;

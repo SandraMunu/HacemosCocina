@@ -233,7 +233,7 @@ const MobileHome = ({ onRegister, onLogin, onChat, showFab }) => {
   }, [onRegister, onLogin]);
 
   // attach dots to all the carousels
-  useCarouselDots('.m-app .eventos__grid, .m-app .articulos__grid, .m-app .embajadores__grid, .m-app .herramientas__grid, .m-app .pildoras__carousel');
+  useCarouselDots('.m-app .eventos__grid, .m-app .articulos__grid, .m-app .embajadores__grid, .m-app .pildoras__carousel');
 
   // Inject "Ver todos" button at the end of each section that has a section__see-all
   React.useEffect(() => {
@@ -276,8 +276,8 @@ const MobileHome = ({ onRegister, onLogin, onChat, showFab }) => {
 /* ============================================================
    MOBILE AUTH — wraps RegistrationModal
    ============================================================ */
-const MobileAuth = ({ onClose, onComplete, authMode = 'register' }) => (
-  <RegistrationModal initialMode={authMode} onClose={onClose} onComplete={onComplete} />
+const MobileAuth = ({ onClose, onComplete, authMode = 'register', initialEmail = '', initialName = '' }) => (
+  <RegistrationModal initialMode={authMode} initialEmail={initialEmail} initialName={initialName} onClose={onClose} onComplete={onComplete} />
 );
 
 /* ============================================================
@@ -352,6 +352,9 @@ const MobileApp = () => {
   const [user, setUser] = React.useState(null);
   const [drawer, setDrawer] = React.useState(false);
   const [chatOpen, setChatOpen] = React.useState(false);
+  const [showWelcome, setShowWelcome] = React.useState(false);
+  const [eventoData, setEventoData] = React.useState(null);
+  const [chatRegData, setChatRegData] = React.useState(null);
 
   React.useEffect(() => {
     window.__openRegister = () => { setAuthMode('register'); setView('auth'); };
@@ -360,10 +363,16 @@ const MobileApp = () => {
     window.__goPrivate = () => { setView('private'); window.scrollTo(0, 0); };
     window.__viewEstablishments = () => { setView('establishments'); window.scrollTo(0, 0); };
     window.__editProfile = () => { setView('edit-profile'); window.scrollTo(0, 0); };
+    window.__openFandit = () => { setView('fandit'); window.scrollTo(0, 0); };
+    window.__openEvento = (ev) => { setEventoData(ev || null); setView('evento'); window.scrollTo(0, 0); };
+    window.__openVerifyFromChat = (info) => { setChatRegData(info || {}); setAuthMode('verify'); setView('auth'); };
     return () => {
       delete window.__openRegister; delete window.__openLogin;
       delete window.__goHome; delete window.__goPrivate;
       delete window.__viewEstablishments; delete window.__editProfile;
+      delete window.__openFandit;
+      delete window.__openEvento;
+      delete window.__openVerifyFromChat;
     };
   }, []);
 
@@ -395,8 +404,11 @@ const MobileApp = () => {
   }, [chatOpen, drawer]);
 
   const handleComplete = (data) => {
-    setUser(data);
+    const { __welcome, ...userData } = data || {};
+    setUser(userData);
+    setChatRegData(null);
     setView('private');
+    if (__welcome) setShowWelcome(true);
     window.scrollTo(0, 0);
   };
 
@@ -446,6 +458,15 @@ const MobileApp = () => {
         onProfile={() => { setView('private'); window.scrollTo(0, 0); }}
       />
     );
+  } else if (view === 'evento' || view === 'fandit') {
+    header = (
+      <MobileHeader
+        user={user}
+        onMenu={() => setDrawer(true)}
+        onLogo={goHomeKeepUser}
+        onProfile={goPrivate}
+      />
+    );
   }
 
   return (
@@ -472,7 +493,9 @@ const MobileApp = () => {
       {view === 'auth' && (
         <MobileAuth
           authMode={authMode}
-          onClose={() => setView(user ? 'private' : 'home')}
+          initialEmail={(chatRegData && chatRegData.email) || ''}
+          initialName={(chatRegData && chatRegData.nombre) || ''}
+          onClose={() => { setChatRegData(null); setView(user ? 'private' : 'home'); }}
           onComplete={handleComplete}
         />
       )}
@@ -501,11 +524,29 @@ const MobileApp = () => {
         />
       )}
 
+      {view === 'fandit' && (
+        <React.Fragment>
+          <FanditPage onBack={() => { setView('home'); window.scrollTo(0, 0); }} />
+          <MobileFooter />
+        </React.Fragment>
+      )}
+
+      {view === 'evento' && (
+        <React.Fragment>
+          <EventoPage ev={eventoData} onBack={() => { setView('home'); window.scrollTo(0, 0); }} />
+          <MobileFooter />
+        </React.Fragment>
+      )}
+
       {drawer && (
         <MobileDrawer
           onClose={() => setDrawer(false)}
           onRegister={() => setView('auth')}
         />
+      )}
+
+      {showWelcome && view === 'private' && (
+        <WelcomeModal onClose={() => setShowWelcome(false)} />
       )}
     </div>
   );

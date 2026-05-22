@@ -57,8 +57,8 @@ window.HC_DATA = {
     { id: "pl5", cat: "Marketing", title: "Una foto de plato bien hecha con el móvil", author: "Sofía Pereda", dur: "1:11", photo: "assets/pildora-5.png" },
   ],
   herramientas: [
-    { id: "h1", overline: "Fandit", title: "Ayudas y subvenciones", style: "default", logo: "assets/logo-fandit.png" },
     { id: "h5", overline: "Shifty", title: "Encuentra personal", style: "default", logo: "assets/logo-shifty.png" },
+    { id: "h1", overline: "Fandit", title: "Ayudas y subvenciones", style: "default", logo: "assets/logo-fandit.png" },
     { id: "h6", overline: "Tipi", title: "Conoce el beneficio de tu plato", style: "default", logo: "assets/logo-tipi.png" },
     { id: "h2", overline: "Gestión de reseñas", title: "Controla lo que dicen de tu restaurante", style: "default", icon: "chart" },
     { id: "h3", overline: "Calculadora CAEs", title: "Ahorra en tu factura energética", style: "default", icon: "sparkle" },
@@ -103,8 +103,8 @@ window.HC_DATA = {
     {
       id: "a1",
       cat: "Oferta gastronómica",
-      title: "¿Cómo sacarle el máximo partido a los galardonados de Repsol en redes sociales?",
-      excerpt: "Haz que tus galardones brillen en el mundo digital",
+      title: "¿Cómo sacarle el máximo partido a tu proyecto en redes sociales?",
+      excerpt: "Haz que tu espacio brille en el mundo digital.",
       author: "Marta Sahelices",
       read: "3 min",
       date: "8 nov 2025",
@@ -113,7 +113,7 @@ window.HC_DATA = {
     {
       id: "a2",
       cat: "Historias de la calle",
-      title: "Cómo mejorar la reputación digital de tu negocio",
+      title: "Cómo conseguir más clientes para tu negocio",
       excerpt: "Sabemos que llevar un negocio de hostelería significa estar en todo: barra, sala, cocina, gestión… Pero hay algo que no puedes dejar de lado: tu reputación digital.",
       author: "Carlos Maribona",
       read: "3 min",

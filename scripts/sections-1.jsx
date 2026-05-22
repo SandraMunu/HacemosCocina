@@ -89,8 +89,21 @@ const Hero = () =>
 
 
 // ---------------- EVENTOS ----------------
-const EventCard = ({ ev }) =>
-<article className="event-card">
+const EventCard = ({ ev }) => {
+  const isLinkable = ev.id === "e1";
+  const handleClick = (e) => {
+    if (isLinkable && typeof window !== "undefined" && typeof window.__openEvento === "function") {
+      e.preventDefault();
+      window.__openEvento(ev);
+    }
+  };
+  return (
+    <article
+      className={"event-card" + (isLinkable ? " event-card--linkable" : "")}
+      onClick={handleClick}
+      role={isLinkable ? "link" : undefined}
+      tabIndex={isLinkable ? 0 : undefined}
+      onKeyDown={(e) => { if (isLinkable && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); handleClick(e); } }}>
     <div className="event-card__photo ph">
       <img src={ev.photo} alt="" />
       <div className="event-card__date">
@@ -120,10 +133,11 @@ const EventCard = ({ ev }) =>
           <span className="av"><img src="https://i.pravatar.cc/64?img=47" alt="" /></span>
           <span className="count">+{ev.attendees} apuntados</span>
         </div>
-        <a className="btn btn--navy btn--sm" href="#">Apúntate</a>
+        <a className="btn btn--navy btn--sm" href="#" onClick={(e) => e.stopPropagation()}>Apúntate</a>
       </div>
     </div>
-  </article>;
+  </article>);
+};
 
 
 const Eventos = () =>
@@ -146,3 +160,4 @@ const Eventos = () =>
 window.Nav = Nav;
 window.Hero = Hero;
 window.Eventos = Eventos;
+window.EventCard = EventCard;

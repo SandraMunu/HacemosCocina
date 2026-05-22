@@ -56,7 +56,7 @@ const ArticleCard = ({ a }) =>
 <article className="article-card">
     <div className="article-card__photo ph">
       <img src={a.photo} alt="" />
-      <span className="article-card__overline">{a.read} lectura o escucha</span>
+      <span className="article-card__overline">{a.read}</span>
     </div>
     <div className="article-card__body">
       <h3 className="article-card__title">{a.title}</h3>
@@ -64,13 +64,12 @@ const ArticleCard = ({ a }) =>
       <div className="article-card__meta">
         <span>{a.date}</span>
       </div>
-      <button type="button" className="btn btn--ghost btn--sm article-card__audio-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <button type="button" className="article-card__audio-btn" aria-label="Reproducir audio">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none" />
           <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
           <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
         </svg>
-        Reproducir audio
       </button>
     </div>
   </article>;
@@ -101,7 +100,7 @@ const FooterCta = () =>
         <h2 className="footer-cta__title">Tu cocina, tu negocio, tu casa</h2>
         <p className="footer-cta__lede">El espacio donde nos encontramos. Hacemos cocina de Guía Repsol.
       </p>
-        <a className="btn btn--primary" href="#">Crear cuenta <Icon name="arrow" size={18} /></a>
+        <a className="btn btn--primary" href="#">Regístrate <Icon name="arrow" size={18} /></a>
       </div>
       <div className="footer-cta__art">
         <img src="assets/footer-cta-cocineros.jpg" alt="Cocineros en cocina" />
@@ -213,18 +212,27 @@ const DesktopApp = () => {
   const [authMode, setAuthMode] = React.useState(null); // null | "register" | "login"
   const [user, setUser] = React.useState(null);
   const [chatOpen, setChatOpen] = React.useState(false);
+  const [showWelcome, setShowWelcome] = React.useState(false);
+  const [eventoData, setEventoData] = React.useState(null);
+  const [chatRegData, setChatRegData] = React.useState(null);
 
   React.useEffect(() => {
     window.__openRegister = () => setAuthMode("register");
     window.__openLogin = () => setAuthMode("login");
-    window.__goHome = () => { setView("home"); window.scrollTo(0, 0); };
-    window.__goPrivate = () => { setView("private"); window.scrollTo(0, 0); };
-    window.__viewEstablishments = () => { setView("establishments"); window.scrollTo(0, 0); };
-    window.__editProfile = () => { setView("edit-profile"); window.scrollTo(0, 0); };
+    window.__goHome = () => {setView("home");window.scrollTo(0, 0);};
+    window.__goPrivate = () => {setView("private");window.scrollTo(0, 0);};
+    window.__viewEstablishments = () => {setView("establishments");window.scrollTo(0, 0);};
+    window.__editProfile = () => {setView("edit-profile");window.scrollTo(0, 0);};
+    window.__openFandit = () => {setView("fandit");window.scrollTo(0, 0);};
+    window.__openEvento = (ev) => {setEventoData(ev || null);setView("evento");window.scrollTo(0, 0);};
+    window.__openVerifyFromChat = (info) => { setChatRegData(info || {}); setAuthMode("verify"); };
     return () => {
-      delete window.__openRegister; delete window.__openLogin;
-      delete window.__goHome; delete window.__goPrivate;
-      delete window.__viewEstablishments; delete window.__editProfile;
+      delete window.__openRegister;delete window.__openLogin;
+      delete window.__goHome;delete window.__goPrivate;
+      delete window.__viewEstablishments;delete window.__editProfile;
+      delete window.__openFandit;
+      delete window.__openEvento;
+      delete window.__openVerifyFromChat;
     };
   }, []);
 
@@ -233,11 +241,17 @@ const DesktopApp = () => {
   }, [authMode]);
 
   const handleComplete = (data) => {
-    setUser(data);
+    const { __welcome, ...userData } = data || {};
+    setUser(userData);
     setAuthMode(null);
+    setChatRegData(null);
     setView("private");
+    if (__welcome) setShowWelcome(true);
     window.scrollTo(0, 0);
   };
+
+  const closeAuth = () => { setAuthMode(null); setChatRegData(null); };
+  const authModal = authMode ? <RegistrationModal initialMode={authMode} initialEmail={(chatRegData && chatRegData.email) || ""} initialName={(chatRegData && chatRegData.nombre) || ""} onClose={closeAuth} onComplete={handleComplete} /> : null;
 
   if (view === "private") {
     const u = user || { nombre: "Ane", apellido: "G." };
@@ -245,7 +259,8 @@ const DesktopApp = () => {
       <React.Fragment>
         <PrivateArea user={u} onLogout={() => {setUser(null);setView("home");}} />
         <DemoTabs view={view} setView={setView} openReg={() => setAuthMode("register")} authMode={authMode} setUser={setUser} />
-        {authMode && <RegistrationModal initialMode={authMode} onClose={() => setAuthMode(null)} onComplete={handleComplete} />}
+        {authModal}
+        {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
       </React.Fragment>);
 
   }
@@ -254,9 +269,9 @@ const DesktopApp = () => {
     const u = user || { nombre: "Ane", apellido: "G." };
     return (
       <React.Fragment>
-        <EstablishmentsPage user={u} onBack={() => { setView("private"); window.scrollTo(0, 0); }} />
+        <EstablishmentsPage user={u} onBack={() => {setView("private");window.scrollTo(0, 0);}} />
         <DemoTabs view={view} setView={setView} openReg={() => setAuthMode("register")} authMode={authMode} setUser={setUser} />
-        {authMode && <RegistrationModal initialMode={authMode} onClose={() => setAuthMode(null)} onComplete={handleComplete} />}
+        {authModal}
       </React.Fragment>);
 
   }
@@ -265,9 +280,31 @@ const DesktopApp = () => {
     const u = user || { nombre: "Ane", apellido: "G." };
     return (
       <React.Fragment>
-        <EditProfilePage user={u} onBack={() => { setView("private"); window.scrollTo(0, 0); }} />
+        <EditProfilePage user={u} onBack={() => {setView("private");window.scrollTo(0, 0);}} />
         <DemoTabs view={view} setView={setView} openReg={() => setAuthMode("register")} authMode={authMode} setUser={setUser} />
-        {authMode && <RegistrationModal initialMode={authMode} onClose={() => setAuthMode(null)} onComplete={handleComplete} />}
+        {authModal}
+      </React.Fragment>);
+
+  }
+
+  if (view === "fandit") {
+    return (
+      <React.Fragment>
+        <FanditPage onBack={() => {setView("home");window.scrollTo(0, 0);}} />
+        <DemoTabs view={view} setView={setView} openReg={() => setAuthMode("register")} authMode={authMode} setUser={setUser} />
+        {authModal}
+      </React.Fragment>);
+
+  }
+
+  if (view === "evento") {
+    return (
+      <React.Fragment>
+        <Nav loggedInUser={user} onLogout={() => setUser(null)} />
+        <EventoPage ev={eventoData} onBack={() => {setView("home");window.scrollTo(0, 0);}} />
+        <Footer />
+        <DemoTabs view={view} setView={setView} openReg={() => setAuthMode("register")} authMode={authMode} setUser={setUser} />
+        {authModal}
       </React.Fragment>);
 
   }
@@ -293,7 +330,7 @@ const DesktopApp = () => {
         </span>
       </button>
       {chatOpen && <ChatModal user={user} onClose={() => setChatOpen(false)} onRegister={() => setAuthMode("register")} />}
-      {authMode && <RegistrationModal initialMode={authMode} onClose={() => setAuthMode(null)} onComplete={handleComplete} />}
+      {authModal}
       <DemoTabs view={view} setView={setView} openReg={() => setAuthMode("register")} authMode={authMode} setUser={setUser} />
     </React.Fragment>);
 

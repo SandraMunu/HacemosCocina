@@ -135,11 +135,11 @@ const JoinGuiaRepsol = () =>
 <section className="pa-sobreti-wrap" style={{ gap: "20px" }}>
     <div className="pa-join-card">
       <div className="pa-join-card__copy">
-        <h2 className="pa-h2 pa-join-card__title">¿Quieres que tu establecimiento aparezca en Guía Repsol?</h2>
-        <p className="pa-join-card__lede">Cuéntanos tu proyecto y, si encaja en nuestro radar, hablamos. Sin compromiso, sin prisa: solo lo que cocináis y por qué creéis que merece la pena.</p>
+        <h2 className="pa-h2 pa-join-card__title">¿Te gustaría que tu negocio apareciese en Guía Repsol?</h2>
+        <p className="pa-join-card__lede">Queremos conocer tu proyecto. Cuéntanos qué hace único a tu restaurante.</p>
       </div>
       <a href="#" className="btn btn--navy pa-join-card__cta">
-        Cuéntanos tu proyecto
+        Empezar
         <Icon name="arrow" size={14} />
       </a>
     </div>
@@ -188,6 +188,63 @@ const AccesosDirectos = () => {
         {items.map((it) =>
           <a key={it.id} className="pa-acceso" href="#">
             <span className="pa-acceso__icon pa-acceso__icon--logo"><img src={it.logo} alt="" /></span>
+            <span className="pa-acceso__label">{it.label}</span>
+            <svg className="pa-acceso__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
+          </a>
+          )}
+        </div>
+      </div>
+    </section>);
+
+};
+
+
+// ---------- ACCIONES RÁPIDAS ----------
+const AccionesRapidas = () => {
+  const items = [
+  {
+    id: "historia",
+    label: "Quiero contar mi historia",
+    icon:
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="9" y="3" width="6" height="12" rx="3" />
+          <path d="M5 11a7 7 0 0 0 14 0" />
+          <path d="M12 18v3" />
+        </svg>
+
+  },
+  {
+    id: "encuentro",
+    label: "Quiero organizar un encuentro",
+    icon:
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="9" cy="8" r="3" />
+          <circle cx="17" cy="9" r="2.2" />
+          <path d="M3 19a6 6 0 0 1 12 0" />
+          <path d="M14.5 19a4 4 0 0 1 6.5-3" />
+        </svg>
+
+  },
+  {
+    id: "vallehermoso",
+    label: "Quiero acudir al Mercado de Vallehermoso",
+    icon:
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 9h18l-2-5H5l-2 5z" />
+          <path d="M5 9v10h14V9" />
+          <path d="M9 19v-6h6v6" />
+        </svg>
+
+  }];
+
+  return (
+    <section className="pa-sobreti-wrap">
+      <h2 className="pa-h2 pa-sobreti__h2">Sumérgete en el mundo Guía Repsol</h2>
+      <div className="pa-card-block pa-block--accesos">
+        <div className="pa-accesos">
+        {items.map((it) =>
+          <a key={it.id} className="pa-acceso" href="#">
+            <span className="pa-acceso__icon">{it.icon}</span>
             <span className="pa-acceso__label">{it.label}</span>
             <svg className="pa-acceso__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
           </a>
@@ -380,7 +437,11 @@ const ChatModal = ({ user, onClose, onRegister }) => {
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
     onClose();
-    if (onRegister) onRegister();
+    if (typeof window !== "undefined" && typeof window.__openVerifyFromChat === "function") {
+      window.__openVerifyFromChat({ email: guestEmail, nombre: guestName });
+    } else if (onRegister) {
+      onRegister();
+    }
   };
 
   return (
@@ -389,7 +450,7 @@ const ChatModal = ({ user, onClose, onRegister }) => {
         {/* Header */}
         <header className="chat-modal__header">
           <h2 className="chat-modal__title" style={{ fontWeight: "400", padding: "24px 0px 16px 24px" }}>
-            {isGuest ? "Hola, Bienvenido a Guía Repsol Hacemos Cocina" : "¿Cómo podemos ayudarte?"}
+            {isGuest ? "¡Te damos la bienvenida a Guía Repsol Hacemos cocina!" : "¿Cómo podemos ayudarte?"}
           </h2>
           <div className="chat-modal__head-actions">
             <button type="button" className="chat-modal__close" onClick={onClose} aria-label="Cerrar">
@@ -406,9 +467,9 @@ const ChatModal = ({ user, onClose, onRegister }) => {
           <div className="chat-guest">
               <div className="chat-bubble chat-bubble--bot chat-bubble--guest">
                 <p className="chat-guest__lede">
-                  Soy el asistente de <strong>Hacemos cocina</strong>. Puedo ayudarte con dudas sobre tu negocio, reseñas, gestión de personal, costes de menú o cualquier cosa del día a día en hostelería.
+                   <strong></strong>Desde aquí podemos ayudarte en todo lo que necesitas diariamente: reseñas, gestión de personal, costes de menú, ayudas y subvenciones o cualquier detalle que te quite el sueño.
                 </p>
-                <p className="chat-guest__lede" style={{ fontWeight: "700" }}>Envíame tu email para acceder.</p>
+                <p className="chat-guest__lede" style={{ fontWeight: "700" }}>Introduce tu correo para empezar</p>
                 {guestStep === 1 &&
               <form className="chat-guest__form" onSubmit={handleEmailSubmit}>
                     <input ref={emailRef} type="email" required placeholder="tu@correo.com" className="chat-guest__input" aria-label="Correo electrónico" />
@@ -426,7 +487,7 @@ const ChatModal = ({ user, onClose, onRegister }) => {
                   </div>
                   <div className="chat-bubble chat-bubble--bot chat-bubble--guest">
                     <p className="chat-guest__lede">
-                      <strong>¡Genial!</strong> Aún no tienes cuenta, mándame tu nombre y número de teléfono para entrar.
+                      <strong>¡Bien!</strong> Veo que aún no tienes cuenta. Déjame tu nombre y número de teléfono para que podamos continuar.
                     </p>
                     {guestStep === 2 &&
                 <form className="chat-guest__form chat-guest__form--stack" onSubmit={handleNameSubmit}>
@@ -464,7 +525,7 @@ const ChatModal = ({ user, onClose, onRegister }) => {
                   </div>
                   <div className="chat-bubble chat-bubble--bot chat-bubble--guest">
                     <p className="chat-guest__lede">
-                      <strong>Muchas gracias{guestName ? ", " + guestName : ""}.</strong> Ya solo te falta crear una contraseña.
+                      <strong>¡Muchas gracias{guestName ? ", " + guestName : ""}!</strong> Ya solo te falta crear una contraseña.
                     </p>
                     <form className="chat-guest__form" onSubmit={handlePasswordSubmit}>
                       <input
@@ -509,7 +570,7 @@ const ChatModal = ({ user, onClose, onRegister }) => {
               {/* Insight cards */}
               <div className="chat-insights">
                 <article className="chat-insight chat-insight--green">
-                  <span className="chat-insight__label" style={{ fontWeight: "600" }}>Aprendizajes</span>
+                  <span className="chat-insight__label" style={{ fontWeight: "600" }}>Claves</span>
                   <p className="chat-insight__text">{CHAT_DATA.learnings}</p>
                 </article>
                 <article className="chat-insight chat-insight--blue">
@@ -589,6 +650,7 @@ const PrivateArea = ({ user, onLogout }) => {
             {activeData.isSolete ? <SobreTi /> : <JoinGuiaRepsol />}
             {activeData.isSolete && <SoleteCreativos />}
             <AccesosDirectos />
+            <AccionesRapidas />
             <EvolucionaNegocio />
           </div>
         </div>
@@ -767,7 +829,7 @@ const EditProfilePage = ({ user, onBack, embedded = false }) => {
 
           <header className="ep-header">
             <h1 className="ep-title">Editar perfil</h1>
-            <p className="ep-lede">Actualiza tus datos personales, tu contraseña y la configuración de tu cuenta.</p>
+            <p className="ep-lede">Actualiza tus datos personales, cambia tu contraseña y gestiona la configuración de tu cuenta.</p>
           </header>
 
           <section className="ep-card">
@@ -793,11 +855,11 @@ const EditProfilePage = ({ user, onBack, embedded = false }) => {
               </div>
 
               <p className="ep-important">
-                <strong>Importante:</strong> Para modificar el correo electrónico, es necesario que te pongas en contacto con nuestro equipo de Atención al cliente <a href="#">[Correo X, Teléfono X]</a>.
+                <strong>Importante:</strong> Si necesitas cambiar tu correo electrónico, ponte en contacto con nuestro equipo de Atención al cliente <a href="#">[Correo X, Teléfono X]</a>.
               </p>
 
               <button type="button" className="ep-toggle" onClick={() => setPwdOpen(!pwdOpen)} aria-expanded={pwdOpen}>
-                <span>Modificar contraseña</span>
+                <span>¿Quieres cambiar tu contraseña? </span>
                 <svg className={"ep-toggle__chev " + (pwdOpen ? "is-open" : "")} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
               </button>
 

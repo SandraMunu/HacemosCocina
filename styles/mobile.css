@@ -314,7 +314,6 @@
 .m-app .eventos__grid,
 .m-app .articulos__grid,
 .m-app .embajadores__grid,
-.m-app .herramientas__grid,
 .m-app .formacion__grid {
   display: flex;
   grid-template-columns: none;
@@ -331,16 +330,21 @@
 .m-app .eventos__grid::-webkit-scrollbar,
 .m-app .articulos__grid::-webkit-scrollbar,
 .m-app .embajadores__grid::-webkit-scrollbar,
-.m-app .herramientas__grid::-webkit-scrollbar,
 .m-app .formacion__grid::-webkit-scrollbar { display: none; }
 
 .m-app .eventos__grid > *,
-.m-app .articulos__grid > *,
-.m-app .herramientas__grid > * {
+.m-app .articulos__grid > * {
   flex: 0 0 85%;
   scroll-snap-align: start;
 }
-.m-app .herramientas__grid > * { flex-basis: 75%; min-height: 180px; }
+
+/* Herramientas: 2-col grid on mobile (no carousel) */
+.m-app .herramientas__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.m-app .herramientas__grid > * { min-height: 160px; }
 .m-app .embajadores__grid > * { flex: 0 0 70%; scroll-snap-align: start; }
 
 /* Cards inside event-card / article-card / tool-tile shrink to fit */
@@ -564,6 +568,7 @@
   align-items: stretch;
   gap: 10px;
 }
+.m-app .auth-actions--stack { flex-direction: column; }
 .m-app .auth-actions .btn { width: 100%; height: 48px; }
 .m-app .auth-page__steps { gap: 6px; margin-bottom: 20px; }
 .m-app .auth-step__label { display: none; }

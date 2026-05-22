@@ -34,7 +34,7 @@ const Podcasts = () =>
         <a className="section__see-all" href="#">Ver todos <Icon name="arrow" size={14} /></a>
       </div>
       <div className="podcast-rail">
-        {HC_DATA.podcasts.map((p) => <PodcastRow key={p.id} p={p} />)}
+        {HC_DATA.podcasts.slice(0, 4).map((p) => <PodcastRow key={p.id} p={p} />)}
       </div>
     </div>
   </section>;
@@ -103,8 +103,21 @@ const Pildoras = () => {
 };
 
 // ---------------- HERRAMIENTAS ----------------
-const ToolTile = ({ t }) =>
-<article className={"tool-tile" + (t.style !== "default" ? " tool-tile--" + t.style : "")}>
+const ToolTile = ({ t }) => {
+  const isFandit = t.overline === "Fandit";
+  const handleClick = (e) => {
+    if (isFandit && typeof window !== "undefined" && typeof window.__openFandit === "function") {
+      e.preventDefault();
+      window.__openFandit();
+    }
+  };
+  return (
+    <article
+      className={"tool-tile" + (t.style !== "default" ? " tool-tile--" + t.style : "")}
+      onClick={handleClick}
+      role={isFandit ? "link" : undefined}
+      tabIndex={isFandit ? 0 : undefined}
+      onKeyDown={(e) => { if (isFandit && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); handleClick(e); } }}>
     <div>
       <div className="tool-tile__overline">{t.overline}</div>
       <h3 className="tool-tile__title">{t.title}</h3>
@@ -121,7 +134,8 @@ const ToolTile = ({ t }) =>
     : <Icon name={t.icon} size={28} />
     }
     </div>
-  </article>;
+  </article>);
+};
 
 
 const Herramientas = () =>

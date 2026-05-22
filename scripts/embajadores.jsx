@@ -51,10 +51,10 @@ const Embajadores = () =>
       </div>
       <div className="embajadores__cta">
         <div className="embajadores__cta-copy">
-          <h3 className="embajadores__cta-title">¿Quieres ser parte de esta red?</h3>
-          <p className="embajadores__cta-sub">Cuéntanos tu proyecto</p>
+          <h3 className="embajadores__cta-title" style={{ fontSize: "20px" }}>¿Quieres ser parte de esta comunidad?</h3>
+          <p className="embajadores__cta-sub">Cuéntanos tu proyecto.</p>
         </div>
-        <a className="btn btn--ghost embajadores__cta-btn" href="#">Mandar solicitud</a>
+        <a className="btn btn--ghost embajadores__cta-btn" href="#">Regístrate</a>
       </div>
     </div>
   </section>;
